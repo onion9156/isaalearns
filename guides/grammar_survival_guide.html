@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isaac's Grammar Survival Guide</title>
+<style>
+@page { size: A4; margin: 9mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 9.5pt;
+  line-height: 1.42;
+  color: #1e293b;
+  background: #f8fafc;
+}
+.header {
+  background: linear-gradient(135deg, #dc2626 0%, #f59e0b 100%);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.header h1 { font-size: 16px; margin-bottom: 2px; }
+.header .sub { font-size: 9px; opacity: 0.95; }
+.header .meta { display: flex; gap: 10px; margin-top: 4px; font-size: 8.5px; flex-wrap: wrap; }
+.header .meta span { background: rgba(255,255,255,0.2); padding: 1px 8px; border-radius: 20px; }
+
+.intro {
+  background: white;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  font-size: 9.5px;
+}
+
+.rule {
+  background: white;
+  border-radius: 6px;
+  padding: 7px 11px;
+  margin-bottom: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.rule-head {
+  font-size: 10px;
+  font-weight: 700;
+  color: #b45309;
+  margin-bottom: 3px;
+  break-after: avoid;
+}
+.rule-head .n {
+  display: inline-block;
+  background: #b45309;
+  color: white;
+  border-radius: 50%;
+  width: 16px; height: 16px;
+  text-align: center;
+  line-height: 16px;
+  font-size: 9px;
+  margin-right: 5px;
+}
+.ex { font-size: 9.5px; margin: 2px 0; }
+.bad { color: #dc2626; font-weight: 600; }
+.good { color: #16a34a; font-weight: 600; }
+.test {
+  background: #fef9c3;
+  border-left: 3px solid #eab308;
+  padding: 3px 8px;
+  margin-top: 3px;
+  font-size: 9.5px;
+  border-radius: 0 4px 4px 0;
+}
+.test .t-label { font-weight: 700; color: #a16207; font-size: 8.5px; }
+.blank {
+  display: inline-block;
+  border-bottom: 1.5px solid #94a3b8;
+  min-width: 90px;
+  height: 13px;
+}
+.tf-circle {
+  display: inline-block;
+  border: 1.5px solid #94a3b8;
+  border-radius: 50%;
+  width: 15px; height: 15px;
+  text-align: center;
+  line-height: 13px;
+  font-size: 8px;
+  margin: 0 1px;
+  vertical-align: middle;
+}
+.canto { color: #64748b; font-size: 8.5px; }
+
+.section-label {
+  font-size: 10px; font-weight: 700; color: #b45309;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  margin: 6px 0 4px 0;
+  break-after: avoid;
+}
+
+.final-quiz {
+  background: linear-gradient(135deg, #eef2ff 0%, #fef9c3 100%);
+  border: 2px solid #6366f1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+.final-quiz h3 { color: #4f46e5; font-size: 11px; margin-bottom: 4px; }
+.fq { font-size: 9.5px; margin-bottom: 3px; }
+
+.answers {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: 1.5px dashed #94a3b8;
+  border-radius: 6px;
+  font-size: 8px;
+  color: #64748b;
+  line-height: 1.5;
+}
+.answers strong { color: #334155; }
+
+.footer { text-align: center; font-size: 7.5px; color: #94a3b8; margin-top: 6px; }
+.page-break { page-break-before: always; }
+.win-box {
+  background: #f0fdf4;
+  border: 1.5px solid #16a34a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 9px;
+}
+.win-box .w-title { font-weight: 700; color: #15803d; margin-bottom: 2px; font-size: 9.5px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎒 Isaac's Grammar Survival Guide</h1>
+  <div class="sub">你過去五個月（5月–8月）嘅錯誤，全部整理成 10 條黃金規則 · 附 self-test</div>
+  <div class="meta">
+    <span>📅 Aug 2026</span>
+    <span>⏱️ Self-test ~15 min</span>
+    <span>📝 12 test Qs</span>
+    <span>🎯 全部係你嘅 REAL mistakes</span>
+  </div>
+</div>
+
+<div class="intro">
+  <strong>Isaac：</strong>呢本係你嘅「急救包」。下面每一條規則都係你 5 月到 8 月真係犯過嘅錯 —— 由 Frankenstein 造句、6 月 mock、到你上星期嘅 worksheet。
+  你進步咗好多（有啲錯你已經改晒，我標咗 🏆），但係有幾個「慣犯」到而家仲出現。睇完每條規則，做埋下面嘅 self-test。**錯咗嘅唔緊要 — 識得自己改先係真識。**
+</div>
+
+<div class="win-box">
+  <div class="w-title">🏆 先講你已經 KO 咗嘅（唔使再驚）：</div>
+  Although...but ✗（你兩次全對！）· 條件句 conditionals（15/15 滿分）· hitted→hit · leaved→left · police are ✓ · would have bring→brought · 「verb 後面加 -ly」· over-apply -ly 都改埋 ✅ · afford/affordable 雙形造句勁靚（"I can <strong>afford</strong> this <strong>affordable</strong> iPhone"）
+</div>
+
+<!-- RULE 1 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">1</span>Verb 後面 → 加 -ly。Noun 前面 / linking verb 後面 → Adj（唔好加!）</div>
+  <div class="ex">❌ The enzyme breaks down food <span class="bad">biological</span>. → ✅ <span class="good">biologically</span>（breaks down = verb）</div>
+  <div class="ex">❌ an <span class="bad">astronomically</span> discovery → ✅ <span class="good">astronomical</span> discovery（noun 前面）</div>
+  <div class="ex">❌ were <span class="bad">consciously</span> about → ✅ were <span class="good">conscious</span> of（linking verb 後面）</div>
+  <div class="test"><span class="t-label">TEST 1:</span> The abandoned ship looked ___ (spectacle / spectacular) in the storm. 寫: <span class="blank"></span></div>
+</div>
+
+<!-- RULE 2 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">2</span>a / an 睇「讀音」，唔睇字母 — 你嘅頭號慣犯!</div>
+  <div class="ex"><span class="good">an</span> hour（h 唔發聲）· <span class="good">a</span> university（/j/ 音）· <span class="good">an</span> umbrella · <span class="good">a</span> European</div>
+  <div class="ex">❌ She is <span class="bad">a</span> honest vendor. → ✅ She is <span class="good">an</span> honest vendor.（honest 個 h 係啞嘅!）</div>
+  <div class="test"><span class="t-label">TEST 2:</span> The centenarian waited for ___ hour outside ___ university. 寫: <span class="blank" style="min-width:40px;"></span> + <span class="blank" style="min-width:40px;"></span></div>
+</div>
+
+<!-- RULE 3 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">3</span>have / has / had / would have 之後 → 永遠用 Past Participle</div>
+  <div class="ex">❌ I have <span class="bad">wrote</span> three essays. → ✅ have <span class="good">written</span>（write→wrote→written）</div>
+  <div class="ex">❌ had not <span class="bad">forgot</span> → ✅ had not <span class="good">forgotten</span> · ❌ would have <span class="bad">bring</span> → <span class="good">brought</span> ✓你已改好</div>
+  <div class="ex">要背嘅 All Different 組：write/wrote/<strong>written</strong> · take/took/<strong>taken</strong> · break/broke/<strong>broken</strong> · go/went/<strong>gone</strong></div>
+  <div class="test"><span class="t-label">TEST 3:</span> If the sailors had abandoned the voyage, they would have ___ (miss) the spectacular view. 寫: <span class="blank"></span></div>
+</div>
+
+<!-- RULE 4 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">4</span>Police are · People are — 集合名詞當複數</div>
+  <div class="ex">❌ The police <span class="bad">is</span> investigate → ✅ The police <span class="good">are investigating</span> the cause.</div>
+  <div class="ex">同族：people <strong>are</strong> · children <strong>are</strong> · 但 news <strong>is</strong>、information <strong>is</strong>（不可數）</div>
+  <div class="test"><span class="t-label">TEST 4:</span> The police ___ (be) searching the abandoned building now. The news ___ (be) shocking. 寫: <span class="blank" style="min-width:40px;"></span> + <span class="blank" style="min-width:40px;"></span></div>
+</div>
+
+<!-- RULE 5 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">5</span>Each / Every / Everyone → 單數 (has / is)</div>
+  <div class="ex">❌ Each of the centenarians <span class="bad">have</span> → ✅ <span class="good">has</span> a fascinating story.</div>
+  <div class="ex">Neither...nor → verb 跟最近嗰個：Neither the students nor the <strong>teacher knows</strong>.（你6月啱咗!）</div>
+  <div class="test"><span class="t-label">TEST 5:</span> Every vendor ___ (have) affordable snacks. Neither the captain nor the sailors ___ (was/were) desperate. 寫: <span class="blank" style="min-width:40px;"></span> + <span class="blank" style="min-width:40px;"></span></div>
+</div>
+
+<!-- RULE 6 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">6</span>Passive = be + Past Participle（唔好用 adjective / base verb）</div>
+  <div class="ex">❌ He gets <span class="bad">criticize</span> by his coach → ✅ is <span class="good">criticized</strong></div>
+  <div class="ex">❌ Most of the food can <span class="bad">digestive</span> in our body → ✅ can <span class="good">be digested</span></div>
+  <div class="ex">進行式 passive：was testing → <span class="good">was BEING tested</span></div>
+  <div class="test"><span class="t-label">TEST 6:</span> The suspenseful match ___ (watch) by millions last night. 寫: <span class="blank"></span></div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- RULE 7 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">7</span>Preposition 死黨 — 呢啲 pair 要背</div>
+  <div class="ex">grateful <span class="good">FOR</span> · fascinated <span class="good">BY</span> · conscious <span class="good">OF</span> · famous <span class="good">FOR</span> · get <span class="good">INTO</span> the club</div>
+  <div class="ex">❌ She is <span class="bad">fascinates of</span> recycle. → ✅ She is <span class="good">fascinated by recycling</span>.（之後要 noun/gerund）</div>
+  <div class="test"><span class="t-label">TEST 7:</span> I am grateful ___ your help. He was fascinated ___ the panoramic view. 寫: <span class="blank" style="min-width:40px;"></span> + <span class="blank" style="min-width:40px;"></span></div>
+</div>
+
+<!-- RULE 8 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">8</span>造句時：he / she / it → 唔好漏 -s 🏆你嘅新目標</div>
+  <div class="ex">❌ The TV <span class="bad">predict</span> the weather. → ✅ <span class="good">predicts</span>（你6月嘅錯，8月寫 "product make / system work" 又漏咗）</div>
+  <div class="ex">❌ she <span class="bad">don't</span> accept → ✅ <span class="good">doesn't</span> accept</div>
+  <div class="canto">💡 交卷前最後 scan 一次：每隻 verb 之前係咪 he/she/it？係 → 加 -s。</div>
+  <div class="test"><span class="t-label">TEST 8:</span> The factory ___ (generate) electricity. She ___ (voluntary) helps the villagers. 寫: <span class="blank" style="min-width:40px;"></span> + <span class="blank" style="min-width:40px;"></span></div>
+</div>
+
+<!-- RULE 9 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">9</span>「not」企第一個 modal 後面</div>
+  <div class="ex">❌ people <span class="bad">would have not</span> been sick → ✅ <span class="good">would not have</span> been sick</div>
+  <div class="ex">同族：could not have · should not have · must not</div>
+  <div class="test"><span class="t-label">TEST 9:</span> 排序（重組）: have / would / not / taken → 如果佢知道，佢________ the voyage. 寫: <span class="blank" style="min-width:180px;"></span></div>
+</div>
+
+<!-- RULE 10 -->
+<div class="rule">
+  <div class="rule-head"><span class="n">10</span>一句一個意思 — 唔好用 comma 亂駁兩句</div>
+  <div class="ex">❌ She was desperate, <span class="bad">she lost her money</span>. → ✅ She was desperate <span class="good">because</span> she lost her money. / 兩句分開</div>
+  <div class="ex">❌ The agony was unbearable, <span class="bad">the doctor simulate</span>d a rescue. → 用 because / so / 分兩句</div>
+  <div class="test"><span class="t-label">TEST 10:</span> 圈 T 或 F：「Although the voyage was dangerous, but the sailors survived.」 <span class="tf-circle">T</span> <span class="tf-circle">F</span></div>
+</div>
+
+<!-- FINAL QUIZ -->
+<div class="final-quiz">
+  <h3>⚡ 終極混合測試（Test 11–12）— 亂序出擊!</h3>
+  <div class="fq"><strong>TEST 11:</strong> 改錯（3 個錯）：<em>「Each of the vendors have sell an unique snack, and the customer was fascinate of it.」</em></div>
+  <div class="fq">① <span class="blank"></span> ② <span class="blank"></span> ③ <span class="blank"></span></div>
+  <div class="fq"><strong>TEST 12:</strong> 填正確 form：<em>「The simulation showed that the enzyme ___ (work) ___ (biological) — scientists were fascinated by the result.」</em></div>
+  <div class="fq">① <span class="blank"></span> ② <span class="blank"></span></div>
+</div>
+
+<div class="answers">
+  <strong>✂️ 答案（自己對完先好睇!）：</strong>
+  <strong>1</strong> spectacular · <strong>2</strong> an / a · <strong>3</strong> missed · <strong>4</strong> are / is · <strong>5</strong> has / were · <strong>6</strong> was watched · <strong>7</strong> for / by · <strong>8</strong> generates / voluntarily · <strong>9</strong> would not have taken · <strong>10</strong> F（although 同 but 只可以揀一個）· <strong>11</strong> has / sold / a unique（仲有 was fascinated BY）· <strong>12</strong> works / biologically
+  <br><strong>計分：</strong>12 全對 → 你已經蛻變 🦋 · 10–11 → 好穩，睇返錯嗰條嘅規則 · 8–9 → 重讀 Rule 2、3、8（你嘅三大慣犯）· &lt;8 → 拎返呢份筆記搵 Onion 逐條傾
+</div>
+
+<div class="footer">Isaac's Grammar Survival Guide · May–Aug 2026 error digest · 2025-26-T4-SURVIVAL-GUIDE</div>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚦 Door Dash · A / D / ✔</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', 'Microsoft JhengHei', system-ui, sans-serif; background: linear-gradient(160deg,#1e1b4b,#312e81 60%,#4c1d95); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; color: #fff; }
+.app { width: 100%; max-width: 560px; }
+.hud { display: flex; gap: 8px; margin-bottom: 12px; }
+.chip { background: rgba(255,255,255,.12); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 700; }
+.chip.streak { background: #f59e0b; color: #1e1b4b; }
+.bar { height: 8px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg,#34d399,#22d3ee); width: 0%; transition: width .3s; }
+.card { background: #fff; color: #1e1b4b; border-radius: 18px; padding: 24px 20px; box-shadow: 0 12px 40px rgba(0,0,0,.4); text-align: center; }
+.qno { font-size: 12px; font-weight: 700; color: #7c3aed; letter-spacing: 1px; margin-bottom: 10px; }
+.sentence { font-size: 21px; line-height: 1.5; font-weight: 600; margin-bottom: 6px; }
+.hint { font-size: 13px; color: #64748b; margin-bottom: 18px; }
+.doors { display: flex; gap: 10px; margin-bottom: 4px; }
+.door { flex: 1; border: none; border-radius: 14px; padding: 14px 6px; font-size: 16px; font-weight: 800; cursor: pointer; color: #fff; transition: transform .1s, filter .15s; font-family: inherit; }
+.door small { display: block; font-size: 11px; font-weight: 600; opacity: .85; margin-top: 3px; }
+.door:active { transform: scale(.96); }
+.door.a { background: #e11d48; } .door.d { background: #d97706; } .door.k { background: #059669; }
+.door.dim { filter: grayscale(.7) opacity(.45); }
+.door.good { outline: 4px solid #22d3ee; }
+.fb { margin-top: 16px; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.55; text-align: left; display: none; }
+.fb.ok { display: block; background: #d1fae5; color: #065f46; }
+.fb.no { display: block; background: #fee2e2; color: #991b1b; }
+.fb b { font-size: 15px; }
+.next { margin-top: 14px; background: #4f46e5; border: none; color: #fff; font-size: 15px; font-weight: 800; padding: 12px 28px; border-radius: 12px; cursor: pointer; display: none; font-family: inherit; }
+.end-title { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+.score-big { font-size: 52px; font-weight: 900; background: linear-gradient(90deg,#34d399,#22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stats { margin: 14px 0; text-align: left; font-size: 14px; line-height: 1.7; background: #eef2ff; border-radius: 12px; padding: 12px 16px; color: #312e81; }
+.shot { font-size: 15px; font-weight: 800; color: #b45309; margin: 10px 0; }
+.again { background: #4f46e5; border: none; color: #fff; font-size: 15px; font-weight: 800; padding: 12px 32px; border-radius: 12px; cursor: pointer; font-family: inherit; }
+.title-screen h1 { font-size: 30px; font-weight: 900; margin-bottom: 6px; }
+.title-screen p { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+.legend { display: flex; gap: 8px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+.legend span { border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 800; color: #fff; }
+.hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hud">
+    <div class="chip">⭐ Score: <span id="score">0</span>/<span id="total">10</span></div>
+    <div class="chip streak">🔥 Streak: <span id="streak">0</span></div>
+    <div class="chip">🏆 Best: <span id="best">–</span></div>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+
+  <div class="card title-screen" id="title">
+    <h1>🚦 Door Dash</h1>
+    <p><b>A / D / ✔ 三道門快閃戰</b><br>Isaac × 蝦蝦 · Active ↔ Passive 熱身</p>
+    <div class="legend">
+      <span style="background:#e11d48">A = Add be+V3</span>
+      <span style="background:#d97706">D = Delete be</span>
+      <span style="background:#059669">✔ = Leave it</span>
+    </div>
+    <p style="text-align:left">每題先做 <b>doer-test</b>：主語係咪做動作嗰個？<br>✔ 門啲句子係啱嘅 — <b>唔好見到被動就郁手！</b><br>10 題一 round，答完有解釋。</p>
+    <button class="again" onclick="start()">開始 ▶</button>
+  </div>
+
+  <div class="card hide" id="quiz">
+    <div class="qno" id="qno"></div>
+    <div class="sentence" id="sentence"></div>
+    <div class="hint">主語係 doer 定 receiver？🤔</div>
+    <div class="doors">
+      <button class="door a" id="btnA" onclick="pick('A')">A<small>Add be + V3</small></button>
+      <button class="door d" id="btnD" onclick="pick('D')">D<small>Delete be</small></button>
+      <button class="door k" id="btnK" onclick="pick('K')">✔<small>Leave it!</small></button>
+    </div>
+    <div class="fb" id="fb"></div>
+    <button class="next" id="next" onclick="nextQ()">下一題 ▶</button>
+  </div>
+
+  <div class="card hide" id="end">
+    <div class="end-title">🏁 搞掂！</div>
+    <div class="score-big" id="finalScore"></div>
+    <div class="stats" id="finalStats"></div>
+    <div class="shot">📷 Screenshot 呢一頁 send 俾蝦蝦！</div>
+    <button class="again" onclick="location.reload()">再嚟一局 🔄</button>
+  </div>
+</div>
+
+<script>
+const Q = [
+ {s:"The window broke by the naughty kids last Sunday.", a:"A", w:"window 唔識自己爛 — receiver 做 subject → 要 be + V3：<b>was broken</b>。"},
+ {s:"The Eiffel Tower visits by millions of tourists every year.", a:"A", w:"Tower 唔會自己去參觀 — receiver 做 subject → <b>is visited</b>（by 短語係提示）。"},
+ {s:"The lost boy find by a kind police officer this morning.", a:"A", w:"receiver 做 subject → was + V3：<b>was found</b>（find → found）。"},
+ {s:"The new mall will open by the government next year.", a:"A", w:"future passive 兩粒字：<b>will be opened</b> — will 後面個 be 唔可以唔見！"},
+ {s:"The homework checks by the monitor every morning.", a:"A", w:"homework 係 receiver → <b>is checked</b>（present passive：is/are + V3）。"},
+ {s:"The waiter was dropped the tray during dinner.", a:"D", w:"waiter 係 <b>doer</b>（佢自己跌咗個 tray）→ active，刪 was：<b>dropped</b>。"},
+ {s:"My dad was fixed my bike yesterday.", a:"D", w:"dad 係 doer → active：<b>fixed</b>。be 係多餘嘅 — delete！"},
+ {s:"The dog was chased the cat around the garden.", a:"D", w:"dog 係 doer（佢追貓）→ <b>chased</b>，刪走 was。"},
+ {s:"She was won the singing contest last year.", a:"D", w:"she 係 doer → <b>won</b>。win 嘅動作係佢做嘅。"},
+ {s:"The thief was escape before the police came.", a:"D", w:"escape 冇 receiver（唔係嘢俾人 escape）→ <b>永遠 active</b>：escaped。"},
+ {s:"The classroom is cleaned every Friday.", a:"K", w:"✔ 正確 passive：receiver 做 subject + is + V3。<b>唔好郁佢！</b>"},
+ {s:"Harry Potter was written by J.K. Rowling.", a:"K", w:"✔ 正確 past passive：was + V3 + by doer。<b>Leave it alone！</b>"},
+ {s:"These cakes are baked by my aunt every weekend.", a:"K", w:"✔ receiver 做 subject + are + baked(V3) — 完全啱。<b>T is a real answer！</b>"},
+ {s:"The suspects were questioned by detectives for hours.", a:"K", w:"✔ were + questioned(V3)，SVA 都啱 — 呢句無罪，唔好裁佢。"},
+ {s:"Mobile phones are banned in our school.", a:"K", w:"✔ 正確 passive（by-phrase 冇寫出嚟都得）。啱嘅嘢就 ✔。"}
+];
+const NAMES = {A:"A — Add be + V3（passive 欠 be）", D:"D — Delete be（subject 係 doer，要 active）", K:"✔ — Leave it alone（本身就啱）"};
+let deck=[], i=0, score=0, streak=0, bestStreak=0, miss={A:0,D:0,K:0}, locked=false;
+function shuffle(x){ for(let j=x.length-1;j>0;j--){ const k=Math.floor(Math.random()*(j+1)); [x[j],x[k]]=[x[k],x[j]]; } return x; }
+function start(){
+  deck = shuffle([...Q]).slice(0,10);
+  i=0; score=0; streak=0; bestStreak=0; miss={A:0,D:0,K:0};
+  document.getElementById('total').textContent = deck.length;
+  document.getElementById('title').classList.add('hide');
+  document.getElementById('end').classList.add('hide');
+  document.getElementById('quiz').classList.remove('hide');
+  const b = +localStorage.getItem('doordash_best')||0;
+  document.getElementById('best').textContent = b? b+'/'+deck.length : '–';
+  show();
+}
+function show(){
+  locked=false;
+  const q = deck[i];
+  document.getElementById('qno').textContent = `Q${i+1} / ${deck.length}`;
+  document.getElementById('sentence').textContent = q.s;
+  document.getElementById('fb').className='fb'; document.getElementById('fb').textContent='';
+  document.getElementById('next').style.display='none';
+  ['A','D','K'].forEach(k=>{ const b=document.getElementById('btn'+k); b.classList.remove('dim','good'); b.disabled=false; });
+  document.getElementById('bar').style.width = (i/deck.length*100)+'%';
+}
+function pick(p){
+  if(locked) return; locked=true;
+  const q = deck[i];
+  ['A','D','K'].forEach(k=>{ const b=document.getElementById('btn'+k); b.disabled=true; if(k!==q.a) b.classList.add('dim'); if(k===q.a) b.classList.add('good'); });
+  const fb = document.getElementById('fb');
+  if(p===q.a){
+    score++; streak++; bestStreak=Math.max(bestStreak,streak);
+    fb.className='fb ok';
+    fb.innerHTML = `<b>✅ 啱！${NAMES[q.a]}</b><br>${q.w}` + (streak>=3?`<br>🔥 ${streak} 連勝！`:'');
+  } else {
+    streak=0; miss[p]++;
+    fb.className='fb no';
+    fb.innerHTML = `<b>❌ 你揀咗 ${NAMES[p]}</b><br>正確係 <b>${NAMES[q.a]}</b><br>${q.w}`;
+  }
+  document.getElementById('score').textContent=score;
+  document.getElementById('streak').textContent=streak;
+  document.getElementById('next').style.display='inline-block';
+}
+function nextQ(){
+  i++;
+  if(i>=deck.length){ finish(); } else { show(); }
+}
+function finish(){
+  document.getElementById('quiz').classList.add('hide');
+  document.getElementById('end').classList.remove('hide');
+  document.getElementById('bar').style.width='100%';
+  const pct = Math.round(score/deck.length*100);
+  document.getElementById('finalScore').textContent = `${score}/${deck.length} · ${pct}%`;
+  let tips = [];
+  if(miss.A>=2) tips.push('錯 A 偏多 → 見到 by 短語 + receiver 做 subject 就諗「be + V3」');
+  if(miss.D>=2) tips.push('錯 D 偏多 → subject 係 doer 嘅話，be 係多餘，刪！');
+  if(miss.K>=2) tips.push('錯 ✔ 偏多 → 唔好見被動就改。<b>T is a real answer！</b>');
+  if(!tips.length) tips.push('三道門全部穩陣 — 功課 Part A 就係咁打法 💪');
+  document.getElementById('finalStats').innerHTML =
+    `🔥 Best streak: <b>${bestStreak}</b><br>` +
+    `🚪 錯門統計 — A: ${miss.A} · D: ${miss.D} · ✔: ${miss.K}<br>` +
+    `💡 ${tips.join('<br>💡 ')}`;
+  const b = +localStorage.getItem('doordash_best')||0;
+  if(score>b) localStorage.setItem('doordash_best',score);
+}
+</script>
+</body>
+</html>

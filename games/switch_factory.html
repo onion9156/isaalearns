@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏭 SWITCH FACTORY — 句子工場大亨</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #312e81); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 14px; }
+  .wrap { width: 100%; max-width: 640px; }
+  .head { background: linear-gradient(135deg, #b45309, #dc2626); border-radius: 14px; padding: 11px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .head h1 { font-size: 19px; }
+  .head .sub { font-size: 10.5px; opacity: .92; margin-top: 2px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,.08); border-radius: 10px; padding: 7px 12px; font-size: 12.5px; font-weight: 800; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .combo { color: #fbbf24; }
+  .card { background: #f8fafc; color: #1e293b; border-radius: 16px; padding: 18px; margin-bottom: 10px; }
+  .center { text-align: center; }
+  .big { font-size: 42px; margin-bottom: 6px; }
+  .score-line { font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+  .legend { font-size: 12.5px; color: #475569; line-height: 1.8; margin: 8px 0 2px; text-align: left; }
+  .start-btn { border: 0; background: linear-gradient(135deg, #b45309, #dc2626); color: #fff; border-radius: 14px; padding: 14px 34px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 12px; }
+  /* ── factory floor ── */
+  .factory { background: #1e293b; border-radius: 16px; padding: 14px 12px 10px; margin-bottom: 10px; position: relative; overflow: hidden; }
+  .lvl-banner { text-align: center; font-size: 13px; font-weight: 900; color: #fbbf24; letter-spacing: 2px; margin-bottom: 10px; }
+  .beltzone { position: relative; height: 190px; }
+  .belt { position: absolute; bottom: 0; left: 0; right: 0; height: 34px; background: repeating-linear-gradient(90deg, #334155 0 26px, #475569 26px 52px); border-top: 4px solid #0f172a; border-bottom: 4px solid #0f172a; animation: move 1.1s linear infinite; border-radius: 4px; }
+  @keyframes move { from { background-position-x: 0; } to { background-position-x: 52px; } }
+  .belt.paused { animation-play-state: paused; }
+  .crate { position: absolute; bottom: 40px; left: 0; width: 210px; min-height: 108px; background: linear-gradient(160deg, #d97706, #b45309); border: 3px solid #78350f; border-radius: 12px; padding: 9px 11px; color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.45); transition: left .45s ease-in, transform .3s, opacity .3s; }
+  .crate.at-station { left: 50%; margin-left: -105px; }
+  .crate.exit-left { left: -240px; opacity: .4; }
+  .crate .tag { font-size: 9px; font-weight: 900; letter-spacing: 1px; color: #fde68a; }
+  .crate .txt { font-size: 12.5px; font-weight: 700; line-height: 1.45; margin-top: 3px; }
+  .crate .chip { display: inline-block; font-size: 10.5px; font-weight: 900; border-radius: 6px; padding: 2px 8px; margin-bottom: 3px; }
+  .cp { background: #ede9fe; color: #5b21b6; } .ca { background: #dcfce7; color: #14532d; } .cj { background: #fee2e2; color: #7f1d1d; }
+  .crate.boss { background: linear-gradient(160deg, #f59e0b, #dc2626); border-color: #7f1d1d; box-shadow: 0 0 22px rgba(245,158,11,.65); }
+  .crate .bossb { display: inline-block; background: #7f1d1d; color: #fff; font-size: 9.5px; font-weight: 900; border-radius: 6px; padding: 2px 8px; margin-bottom: 3px; }
+  .crate .typein { width: 100%; border: 2px solid #78350f; border-radius: 8px; padding: 6px 8px; font-size: 12px; font-weight: 700; margin-top: 5px; background: #fffbeb; color: #1e293b; }
+  .crate .okbtn { width: 100%; border: 0; background: #1d4ed8; color: #fff; border-radius: 8px; padding: 6px; font-size: 12px; font-weight: 800; cursor: pointer; margin-top: 5px; }
+  .stampzone { position: absolute; top: 6px; left: 0; right: 0; display: none; justify-content: center; gap: 12px; }
+  .stampzone.show { display: flex; }
+  .stamp { border: 3px solid; background: #fff; border-radius: 12px; padding: 10px 22px; font-size: 15px; font-weight: 900; cursor: pointer; }
+  .stamp.pass { border-color: #16a34a; color: #14532d; }
+  .stamp.rej { border-color: #dc2626; color: #7f1d1d; }
+  .timerbar { position: absolute; bottom: 0; left: 0; height: 7px; background: linear-gradient(90deg, #22c55e, #eab308, #dc2626); border-radius: 4px; width: 100%; transition: width .95s linear; }
+  .chutes { display: flex; gap: 10px; margin-top: 8px; }
+  .chute { flex: 1; border: 3px solid; border-radius: 14px; padding: 14px 8px; text-align: center; font-weight: 900; font-size: 15px; cursor: pointer; user-select: none; transition: transform .07s; background: rgba(255,255,255,.04); }
+  .chute:active { transform: scale(.96); }
+  .chute small { display: block; font-size: 10px; font-weight: 600; margin-top: 2px; opacity: .85; }
+  .chute.act { border-color: #22c55e; color: #86efac; }
+  .chute.pas { border-color: #a78bfa; color: #ddd6fe; }
+  .chute.dim { opacity: .35; pointer-events: none; }
+  .fb { border-radius: 12px; padding: 11px 14px; font-size: 12.5px; line-height: 1.55; margin-top: 8px; display: none; background: #fff; color: #1e293b; }
+  .fb.show { display: block; }
+  .fb .v { font-weight: 900; font-size: 13.5px; }
+  .fb .cor { background: #f0fdf4; border: 2px solid #16a34a; border-radius: 8px; padding: 6px 9px; margin-top: 5px; font-weight: 800; }
+  .lvlup { position: absolute; inset: 0; background: rgba(15,23,42,.88); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 5; border-radius: 16px; text-align: center; }
+  .lvlup.show { display: flex; }
+  .lvlup .l1 { font-size: 24px; font-weight: 900; color: #fbbf24; letter-spacing: 3px; }
+  .lvlup .l2 { font-size: 12.5px; color: #e2e8f0; line-height: 1.7; }
+  .endgrid { display: flex; flex-direction: column; gap: 5px; margin: 10px 0; max-height: 250px; overflow-y: auto; text-align: left; }
+  .endrow { background: #f1f5f9; border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #1e293b; line-height: 1.5; }
+  .foot { text-align: center; font-size: 10.5px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>🏭 SWITCH FACTORY 句子工場</h1>
+      <div class="sub">你係分揀主管 — 稽查每一個經過輸送帶嘅句子！</div>
+    </div>
+  </div>
+
+  <div class="hud hidden" id="hud">
+    <span id="lvl">LVL 1</span>
+    <span id="lives">❤️❤️❤️</span>
+    <span class="combo" id="combo">🔥 x1</span>
+    <span id="scorebar">💰 0</span>
+  </div>
+
+  <div id="start" class="card center">
+    <div class="big">🏭</div>
+    <div class="score-line">20 箱句子 · 5 個 LEVELS · 3 條命 · 連擊加錢</div>
+    <div class="legend">
+      🟢 <b>ACTIVE 槽</b>：主語自己做動作嘅句子 → 推入呢邊<br>
+      🟣 <b>PASSIVE 槽</b>：主語係被動嗰個（be + V3）→ 推入呢邊<br>
+      🔴 <b>JUDGE 箱</b>（紅色標籤）：稽查！啱就 <b>✔ 放行</b>，壞就 <b>✘ 彈開</b><br>
+      ⚔ <b>BOSS 箱</b>（發光）：限時之內打字重建成新句子！<br><br>
+      ⏱ 每箱有時間限制，Level 越高帶越快 · 稽查錯或者超時 = 夾爛 −1 ❤️<br>
+      🔥 連續啱 = COMBO，每箱 10 × COMBO 咁計錢 — 睇下你可唔可以全廠最高分！
+    </div>
+    <button class="start-btn" onclick="startGame()">開工上班 ▶</button>
+  </div>
+
+  <div id="game" class="factory hidden">
+    <div class="lvl-banner" id="lvlBanner">LEVEL 1 · 早晨！第一批貨到喇</div>
+    <div class="beltzone">
+      <div class="stampzone" id="stampzone">
+        <button class="stamp pass" onclick="stamp(true)">✔ 放行</button>
+        <button class="stamp rej" onclick="stamp(false)">✘ 彈開</button>
+      </div>
+      <div class="crate" id="crate">
+        <div id="crateTag" class="tag">CRATE</div>
+        <div id="crateChip"></div>
+        <div id="crateTxt" class="txt"></div>
+        <div id="crateType"></div>
+        <div class="timerbar" id="timerbar"></div>
+      </div>
+      <div class="belt" id="belt"></div>
+      <div class="lvlup" id="lvlup">
+        <div class="l1" id="lvlupTitle">LEVEL UP!</div>
+        <div class="l2" id="lvlupMsg"></div>
+      </div>
+    </div>
+    <div class="chutes">
+      <div class="chute act" id="chuteA" onclick="sortTo('A')">🟢 ACTIVE 槽<small>主語做動作</small></div>
+      <div class="chute pas" id="chuteP" onclick="sortTo('P')">🟣 PASSIVE 槽<small>主語被動 be+V3</small></div>
+    </div>
+    <div class="fb" id="fb"></div>
+  </div>
+
+  <div id="end" class="card center hidden">
+    <div class="big" id="endEmoji">🏆</div>
+    <div class="score-line" id="endScore"></div>
+    <div id="endMsg" style="font-size:12.5px;color:#475569;line-height:1.6;"></div>
+    <div class="endgrid" id="endgrid"></div>
+    <button class="start-btn" onclick="location.reload()">聽日再返工 🔄</button>
+  </div>
+
+  <div class="foot">SWITCH FACTORY · 屋企版 · 玩完先做 Rule Switch Challenge 功課<br>稽查錯唔緊要 — 紅色警示會話你知點解 💪</div>
+</div>
+
+<script>
+var FLOW = [
+  // L1 — 慢熱身（18s）
+  { lvl: 1, t: 18, kind: "QS", s: "The chef prepares fresh sushi every morning.", voice: "A" },
+  { lvl: 1, t: 18, kind: "QS", s: "The thief was arrested by the police last night.", voice: "P" },
+  { lvl: 1, t: 18, kind: "QS", s: "I ate two eggs for breakfast.", voice: "A" },
+  { lvl: 1, t: 18, kind: "QS", s: "The new swimming pool will be opened next month.", voice: "P" },
+  // L2 — 加快（15s）＋陰濕句
+  { lvl: 2, t: 15, kind: "QS", s: "Rice grows in this valley.", voice: "A", why: "grow = 生長，冇人做都係 ACTIVE（英文好奇怪位）" },
+  { lvl: 2, t: 15, kind: "QS", s: "The medicines are tested by scientists every year.", voice: "P" },
+  { lvl: 2, t: 15, kind: "QS", s: "The email has been sent by Mr. Chan.", voice: "P", why: "has been + V3 = perfect 被動 — 係 PASSIVE" },
+  { lvl: 2, t: 15, kind: "QS", s: "We enjoyed the party very much.", voice: "A" },
+  // L3 — JUDGE 稽查（14s）
+  { lvl: 3, t: 14, kind: "J", s: "The thief was caught by the police.", good: true, why: "receiver 主語 + was + V3 (caught)，完全啱 ✅" },
+  { lvl: 3, t: 14, kind: "J", s: "We were enjoyed the party very much.", good: false, fix: "We enjoyed the party very much.", why: "多餘 be！We 係 doer → active。enjoy 有 object，唔可以有被動" },
+  { lvl: 3, t: 14, kind: "J", s: "The bus was arrived at 8 a.m. yesterday.", good: false, fix: "The bus arrived at 8 a.m. yesterday.", why: "arrive 冇 object → 永遠冇被動（不及物動詞罪）" },
+  { lvl: 3, t: 14, kind: "J", s: "The homework must be finished tonight.", good: true, why: "modal passive：must + be + V3 — be 喺 must 後面都要有 ✅" },
+  // L4 — BOSS 重建（60s/箱）
+  { lvl: 4, t: 25, kind: "QS", s: "An accident happened at the crossroads last night.", voice: "A", why: "happen 不及物 — 冇被動，一句 active 行天下" },
+  { lvl: 4, t: 60, kind: "B", s: "The email has been sent by Mr. Chan.", instr: "⚔ 重建任務：寫返做主動句！", ans: "Mr. Chan has sent the email.",
+    accept: ["mr chan has sent the email", "mr. chan has sent the email", "mr chan has already sent the email", "mr. chan has already sent the email"],
+    why: "perfect 被動 → perfect 主動：has been sent → <b>has sent</b>（tense 住喺 has 度）" },
+  { lvl: 4, t: 25, kind: "QS", s: "The fireman put out the blaze in five minutes.", voice: "A", why: "fireman 熄火 — doer 主語（你 Jun-5 嗰句嘅正確版！）" },
+  { lvl: 4, t: 60, kind: "B", s: "The inspector was testing the students during lunch break.", instr: "⚔ 重建任務：寫返做被動句！", ans: "The students were being tested by the inspector during lunch break.",
+    accept: ["the students were being tested by the inspector during lunch break", "the students were being tested by the inspector"],
+    why: "過去進行被動 = was/were <b>being</b> + V3。8月15號 you 寫過 was tested 欠 being — 今日殺咗佢！students 眾數 → were" },
+  // L5 — 終極快帶（11s）
+  { lvl: 5, t: 11, kind: "QS", s: "The film was watched by millions of people.", voice: "P" },
+  { lvl: 5, t: 11, kind: "QS", s: "Mum cooks dinner every evening.", voice: "A" },
+  { lvl: 5, t: 11, kind: "QS", s: "The window was broken in the storm.", voice: "P", why: "冇 by-phrase 都係 PASSIVE — agent 可以唔講" },
+  { lvl: 5, t: 11, kind: "QS", s: "Charles broke the window with a football.", voice: "A" }
+];
+var LVL_NAMES = { 1: "LEVEL 1 · 早晨！第一批貨到喇", 2: "LEVEL 2 · 帶快咗喇 — 睇清楚！", 3: "LEVEL 3 · 稽查部：壞箱要彈開！", 4: "LEVEL 4 · ⚔ BOSS 箱：打字重建！", 5: "LEVEL 5 · 終極加班：全速傳送帶！" };
+var idx = 0, lives = 3, score = 0, combo = 1, bestCombo = 1, timerId = null, timeLeft = 0, locked = false, report = [];
+
+function $(id) { return document.getElementById(id); }
+function norm(t) { return t.toLowerCase().replace(/[\u2019\u2018]/g, "'").replace(/[.!?,;:]/g, " ").replace(/\s+/g, " ").trim(); }
+
+function startGame() {
+  $('start').classList.add('hidden');
+  $('game').classList.remove('hidden');
+  $('hud').classList.remove('hidden');
+  idx = 0; lives = 3; score = 0; combo = 1; bestCombo = 1; report = [];
+  updateHud(); showCrate();
+}
+function updateHud() {
+  $('lvl').textContent = 'LVL ' + FLOW[idx].lvl;
+  $('lvlBanner').textContent = LVL_NAMES[FLOW[idx].lvl];
+  $('lives').textContent = lives > 0 ? new Array(lives + 1).join('❤️') : '💔';
+  $('combo').textContent = '🔥 x' + combo;
+  $('scorebar').textContent = '💰 ' + score;
+}
+function showCrate() {
+  locked = false;
+  var f = FLOW[idx];
+  var c = $('crate');
+  c.className = 'crate';
+  c.classList.remove('at-station', 'exit-left');
+  $('belt').classList.remove('paused');
+  $('fb').className = 'fb'; $('fb').innerHTML = '';
+  $('stampzone').classList.remove('show');
+  $('crateType').innerHTML = '';
+  $('chuteA').classList.remove('dim'); $('chuteP').classList.remove('dim');
+  $('crateTag').textContent = 'CRATE ' + (idx + 1) + '/20 · LVL ' + f.lvl;
+  if (f.kind === 'QS') {
+    $('crateChip').innerHTML = '<span class="tag">語音稽查：呢句係咩 voice？</span>';
+    $('crateTxt').innerHTML = f.s;
+  } else if (f.kind === 'J') {
+    $('crateChip').innerHTML = '<span class="chip cj">🔴 JUDGE 稽查箱</span>';
+    $('crateTxt').innerHTML = f.s;
+    $('stampzone').classList.add('show');
+    $('chuteA').classList.add('dim'); $('chuteP').classList.add('dim');
+  } else {
+    c.className = 'crate boss';
+    c.classList.add('boss');
+    $('crateChip').innerHTML = '<span class="bossb">⚔ BOSS CRATE</span>';
+    $('crateTxt').innerHTML = '<div style="color:#fde68a;font-size:10.5px;font-weight:900;">' + f.instr + '</div>' + f.s;
+    $('crateType').innerHTML = '<input type="text" class="typein" id="bossIn" autocomplete="off" spellcheck="false" placeholder="打成句…" onkeydown="if(event.key===\'Enter\')checkBoss()"><button class="okbtn" onclick="checkBoss()">REBUILD ✓</button>';
+    $('chuteA').classList.add('dim'); $('chuteP').classList.add('dim');
+  }
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() { c.classList.add('at-station'); });
+  });
+  startTimer(f.t);
+  var bi = $('bossIn'); if (bi) setTimeout(function() { bi.focus(); }, 500);
+}
+function startTimer(sec) {
+  clearInterval(timerId);
+  timeLeft = sec;
+  var bar = $('timerbar');
+  bar.style.transition = 'none'; bar.style.width = '100%';
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      bar.style.transition = 'width ' + sec + 's linear';
+      bar.style.width = '0%';
+    });
+  });
+  timerId = setInterval(function() {
+    timeLeft -= 0.1;
+    if (timeLeft <= 0) { clearInterval(timerId); timeUp(); }
+  }, 100);
+}
+function killTimer() { clearInterval(timerId); $('belt').classList.add('paused'); }
+
+function resolve(ok, whyHtml) {
+  killTimer();
+  locked = true;
+  var f = FLOW[idx];
+  report.push({ f: f, ok: ok });
+  var fb = $('fb');
+  if (ok) {
+    score += 10 * combo;
+    if (combo > bestCombo) bestCombo = combo;
+    combo++;
+    fb.className = 'fb show';
+    fb.innerHTML = '<div class="v" style="color:#15803d;">✅ 出貨成功！+💰' + 10 * (combo - 1) + ' · 🔥 x' + combo + '</div>' + whyHtml;
+  } else {
+    combo = 1;
+    lives--;
+    fb.className = 'fb show';
+    fb.innerHTML = '<div class="v" style="color:#b91c1c;">💥 箱夾爛咗！−1 ❤️</div>' + whyHtml;
+    $('crate').style.transform = 'rotate(-8deg) translateY(6px)';
+  }
+  updateHud();
+  setTimeout(function() {
+    $('crate').classList.add('exit-left');
+    $('crate').style.transform = '';
+    setTimeout(advance, 420);
+  }, ok ? 1500 : 2600);
+}
+function timeUp() {
+  if (locked) return;
+  var f = FLOW[idx];
+  var hint = '';
+  if (f.kind === 'J' && !f.good && f.fix) hint = '<div class="cor">' + f.fix + '</div>';
+  if (f.kind === 'B') hint = '<div class="cor">' + f.ans + '</div>';
+  resolve(false, '<div style="margin-top:4px;">⏱ 超時！' + (f.why || '') + '</div>' + hint);
+}
+function sortTo(chute) {
+  if (locked) return;
+  var f = FLOW[idx];
+  if (f.kind !== 'QS') return;
+  var ok = (chute === f.voice);
+  var why = '';
+  if (ok) {
+    why = '<div style="margin-top:4px;">' + (f.why || (f.voice === 'A' ? '主語自己做動作 → ACTIVE 槽啱晒 ✅' : '主語係被動嗰個（be+V3）→ PASSIVE 槽啱晒 ✅')) + '</div>';
+  } else {
+    why = '<div style="margin-top:4px;">掉錯槽！' + (f.why || (f.voice === 'A' ? '呢句主語自己做動作 — 係 ACTIVE 嚟㗎！' : 'be + V3 喺度 — 主語係被動嗰個，要入 PASSIVE 槽！')) + '</div>';
+  }
+  resolve(ok, why);
+}
+function stamp(saidGood) {
+  if (locked) return;
+  var f = FLOW[idx];
+  if (f.kind !== 'J') return;
+  var ok = (saidGood === f.good);
+  var why;
+  if (ok) {
+    why = '<div style="margin-top:4px;">稽查正確！' + f.why + '</div>';
+  } else {
+    why = '<div style="margin-top:4px;">稽查錯！' + (f.good ? '呢句其實係啱嘅 — ' : '呢句其實係壞嘅 — ') + f.why + '</div>';
+    if (!f.good && f.fix) why += '<div class="cor">' + f.fix + '</div>';
+  }
+  resolve(ok, why);
+}
+function checkBoss() {
+  if (locked) return;
+  var f = FLOW[idx];
+  if (f.kind !== 'B') return;
+  var val = norm($('bossIn').value);
+  if (val === '') return;
+  if (f.accept.indexOf(val) !== -1) {
+    resolve(true, '<div style="margin-top:4px;">BOSS 擊倒！⚔ ' + f.why + '</div>');
+  } else {
+    resolve(false, '<div class="cor">正確重建：' + f.ans + '</div><div style="margin-top:4px;">' + f.why + '</div>');
+  }
+}
+function advance() {
+  if (lives <= 0) { endGame(false); return; }
+  if (idx === FLOW.length - 1) { endGame(true); return; }
+  var prevLvl = FLOW[idx].lvl;
+  idx++;
+  if (FLOW[idx].lvl !== prevLvl) { levelUp(FLOW[idx].lvl); return; }
+  showCrate();
+}
+function levelUp(l) {
+  var lu = $('lvlup');
+  $('lvlupTitle').textContent = 'LEVEL ' + l + '!';
+  $('lvlupMsg').innerHTML = l === 2 ? '帶加速咗 ⚡ 陰濕句出沒 — 逐句做 doer-test！' :
+    l === 3 ? '🔴 JUDGE 稽查箱登場 — 啱就放行，壞就彈開！<br>口訣：講唔出邊度錯 = 佢係啱！' :
+    l === 4 ? '⚔ BOSS 箱嚟喇 — 限時打字重建成新句子！<br>be 冇多冇漏？be 對邊個 subject？V3 用咗未？' :
+    '終極 LEVEL！全速帶 ⚡ 撐住 4 箱就完成今日訂單！';
+  lu.classList.add('show');
+  setTimeout(function() { lu.classList.remove('show'); showCrate(); }, 2400);
+}
+function endGame(won) {
+  $('game').classList.add('hidden');
+  $('end').classList.remove('hidden');
+  var done = report.filter(function(r) { return r.ok; }).length;
+  var pct = Math.round(done / FLOW.length * 100);
+  var emoji = won ? (score >= 350 ? '🏆' : '🎉') : '💔';
+  var title = won ? '今日訂單完成！' : '今日好多人手受傷… 下次再嚟！';
+  $('endEmoji').textContent = emoji;
+  $('endScore').textContent = title + ' 💰 ' + score + ' 分 · 出貨 ' + done + '/20 箱 · 最高連擊 🔥x' + bestCombo;
+  var stars = won ? (score >= 350 ? '⭐⭐⭐ 工場大亨！可以直接做功課 — 每一題都係新一局！' : score >= 220 ? '⭐⭐ 唔錯！錯嗰啲箱上面有解釋，睇明再開工就滿分。' : '⭐ 完成咗 — 玩多次，今次逐句講一次「主語做唔做動作？」先揀槽。')
+    : '唔緊要 — 下面係今日嘅出貨紀錄，睇明每一箱嘅正確答案，聽日再返工！';
+  $('endMsg').innerHTML = stars;
+  var g = $('endgrid');
+  g.innerHTML = '';
+  report.forEach(function(r, i) {
+    var d = document.createElement('div');
+    d.className = 'endrow';
+    var f = r.f;
+    var tag = f.kind === 'J' ? '稽查' : f.kind === 'B' ? 'BOSS' : '分揀';
+    d.innerHTML = (r.ok ? '✅' : '💥') + ' <b>' + tag + ' L' + f.lvl + '</b> ' + f.s + (r.ok ? '' : (f.kind === 'J' ? (f.good ? ' — 其實係 ✔ 啱嘅' : ' → <b>' + (f.fix || '') + '</b>') : f.kind === 'B' ? ' → <b>' + f.ans + '</b>' : ' → 應該入 <b>' + (f.voice === 'A' ? 'ACTIVE' : 'PASSIVE') + '</b> 槽'));
+    g.appendChild(d);
+  });
+}
+</script>
+</body>
+</html>
