@@ -60,6 +60,11 @@
   .lvlup .l2 { font-size: 12.5px; color: #e2e8f0; line-height: 1.7; }
   .endgrid { display: flex; flex-direction: column; gap: 5px; margin: 10px 0; max-height: 250px; overflow-y: auto; text-align: left; }
   .endrow { background: #f1f5f9; border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #1e293b; line-height: 1.5; }
+  .endrow.bad { background: #fef2f2; border-left: 4px solid #dc2626; }
+  .endrow.good { background: #f0fdf4; }
+  .endrow .yours { color: #7c3aed; font-weight: 800; }
+  .endrow .right { color: #14532d; font-weight: 800; }
+  .endrow .why { color: #b45309; }
   .foot { text-align: center; font-size: 10.5px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
   .hidden { display: none !important; }
 </style>
@@ -134,35 +139,35 @@
 
 <script>
 var FLOW = [
-  // L1 — 慢熱身（18s）
-  { lvl: 1, t: 18, kind: "QS", s: "The chef prepares fresh sushi every morning.", voice: "A" },
-  { lvl: 1, t: 18, kind: "QS", s: "The thief was arrested by the police last night.", voice: "P" },
-  { lvl: 1, t: 18, kind: "QS", s: "I ate two eggs for breakfast.", voice: "A" },
-  { lvl: 1, t: 18, kind: "QS", s: "The new swimming pool will be opened next month.", voice: "P" },
+  // L1 — 慢熱身（18s）— 認 voice
+  { lvl: 1, t: 18, kind: "QS", s: "Grandma knits scarves for the whole family.", voice: "A" },
+  { lvl: 1, t: 18, kind: "QS", s: "The stolen bike was found behind the school.", voice: "P" },
+  { lvl: 1, t: 18, kind: "QS", s: "Isaac finished the puzzle in one hour.", voice: "A" },
+  { lvl: 1, t: 18, kind: "QS", s: "The classroom is cleaned every Friday.", voice: "P" },
   // L2 — 加快（15s）＋陰濕句
-  { lvl: 2, t: 15, kind: "QS", s: "Rice grows in this valley.", voice: "A", why: "grow = 生長，冇人做都係 ACTIVE（英文好奇怪位）" },
-  { lvl: 2, t: 15, kind: "QS", s: "The medicines are tested by scientists every year.", voice: "P" },
-  { lvl: 2, t: 15, kind: "QS", s: "The email has been sent by Mr. Chan.", voice: "P", why: "has been + V3 = perfect 被動 — 係 PASSIVE" },
-  { lvl: 2, t: 15, kind: "QS", s: "We enjoyed the party very much.", voice: "A" },
+  { lvl: 2, t: 15, kind: "QS", s: "The cows were milked at dawn.", voice: "P" },
+  { lvl: 2, t: 15, kind: "QS", s: "Sales of electric cars have grown quickly.", voice: "A", why: "grow 喺呢度 = 增長（自己升）— 冇人 grow 佢，ACTIVE（同 rice grows 同一族）" },
+  { lvl: 2, t: 15, kind: "QS", s: "The results will be announced tomorrow.", voice: "P" },
+  { lvl: 2, t: 15, kind: "QS", s: "The twins practised the piano for three hours.", voice: "A" },
   // L3 — JUDGE 稽查（14s）
-  { lvl: 3, t: 14, kind: "J", s: "The thief was caught by the police.", good: true, why: "receiver 主語 + was + V3 (caught)，完全啱 ✅" },
-  { lvl: 3, t: 14, kind: "J", s: "We were enjoyed the party very much.", good: false, fix: "We enjoyed the party very much.", why: "多餘 be！We 係 doer → active。enjoy 有 object，唔可以有被動" },
-  { lvl: 3, t: 14, kind: "J", s: "The bus was arrived at 8 a.m. yesterday.", good: false, fix: "The bus arrived at 8 a.m. yesterday.", why: "arrive 冇 object → 永遠冇被動（不及物動詞罪）" },
-  { lvl: 3, t: 14, kind: "J", s: "The homework must be finished tonight.", good: true, why: "modal passive：must + be + V3 — be 喺 must 後面都要有 ✅" },
+  { lvl: 3, t: 14, kind: "J", s: "The songs were recorded in one take.", good: true, why: "receiver 主語 + were + V3 (recorded) ✅" },
+  { lvl: 3, t: 14, kind: "J", s: "The trip was consisted of four cities.", good: false, fix: "The trip consisted of four cities.", why: "consist 不及物 — 永遠冇被動（同 arrive 一族）" },
+  { lvl: 3, t: 14, kind: "J", s: "This bridge was built in 1899.", good: true, why: "be + V3 + 年份，agent 唔使講 — 正宗被動 ✅" },
+  { lvl: 3, t: 14, kind: "J", s: "The bills is paid by dad every month.", good: false, fix: "The bills are paid by dad every month.", why: "SVA 罪！bills 眾數 → be 用 are，唔係 is" },
   // L4 — BOSS 重建（60s/箱）
-  { lvl: 4, t: 25, kind: "QS", s: "An accident happened at the crossroads last night.", voice: "A", why: "happen 不及物 — 冇被動，一句 active 行天下" },
-  { lvl: 4, t: 60, kind: "B", s: "The email has been sent by Mr. Chan.", instr: "⚔ 重建任務：寫返做主動句！", ans: "Mr. Chan has sent the email.",
-    accept: ["mr chan has sent the email", "mr. chan has sent the email", "mr chan has already sent the email", "mr. chan has already sent the email"],
-    why: "perfect 被動 → perfect 主動：has been sent → <b>has sent</b>（tense 住喺 has 度）" },
-  { lvl: 4, t: 25, kind: "QS", s: "The fireman put out the blaze in five minutes.", voice: "A", why: "fireman 熄火 — doer 主語（你 Jun-5 嗰句嘅正確版！）" },
-  { lvl: 4, t: 60, kind: "B", s: "The inspector was testing the students during lunch break.", instr: "⚔ 重建任務：寫返做被動句！", ans: "The students were being tested by the inspector during lunch break.",
-    accept: ["the students were being tested by the inspector during lunch break", "the students were being tested by the inspector"],
-    why: "過去進行被動 = was/were <b>being</b> + V3。8月15號 you 寫過 was tested 欠 being — 今日殺咗佢！students 眾數 → were" },
+  { lvl: 4, t: 25, kind: "QS", s: "The snow has melted by noon.", voice: "A", why: "melt 呢度用成 active — 雪自己融，中文覺得『被融』但英文冇被動" },
+  { lvl: 4, t: 60, kind: "B", s: "The school hall is being repainted this week.", instr: "⚔ 重建任務：寫返做主動句（加 workmen 做 doer）！", ans: "The workmen are repainting the school hall this week.",
+    accept: ["the workmen are repainting the school hall this week", "the workmen are repainting the school hall", "workmen are repainting the school hall this week", "workmen are repainting the school hall"],
+    why: "進行被動 → 進行主動：is being repainted → <b>are repainting</b>。be 住喺 are 度 + V-ing 返嚟" },
+  { lvl: 4, t: 25, kind: "QS", s: "A famous designer made this dress.", voice: "A", why: "designer 做 — doer 主語 → ACTIVE" },
+  { lvl: 4, t: 60, kind: "B", s: "The new mascot was chosen by the student union.", instr: "⚔ 重建任務：寫返做主動句！", ans: "The student union chose the new mascot.",
+    accept: ["the student union chose the new mascot", "the student union has chosen the new mascot"],
+    why: "過去被動 → 過去主動：was chosen → <b>chose</b>（V2）。tense 由 was 搬落 verb 度" },
   // L5 — 終極快帶（11s）
-  { lvl: 5, t: 11, kind: "QS", s: "The film was watched by millions of people.", voice: "P" },
-  { lvl: 5, t: 11, kind: "QS", s: "Mum cooks dinner every evening.", voice: "A" },
-  { lvl: 5, t: 11, kind: "QS", s: "The window was broken in the storm.", voice: "P", why: "冇 by-phrase 都係 PASSIVE — agent 可以唔講" },
-  { lvl: 5, t: 11, kind: "QS", s: "Charles broke the window with a football.", voice: "A" }
+  { lvl: 5, t: 11, kind: "QS", s: "The stolen paintings were sold online.", voice: "P" },
+  { lvl: 5, t: 11, kind: "QS", s: "The referee blew his whistle.", voice: "A" },
+  { lvl: 5, t: 11, kind: "QS", s: "Those towers were knocked down years ago.", voice: "P", why: "phrasal passive：be + knocked down 都係被動" },
+  { lvl: 5, t: 11, kind: "QS", s: "The temple was destroyed by the earthquake.", voice: "P" }
 ];
 var LVL_NAMES = { 1: "LEVEL 1 · 早晨！第一批貨到喇", 2: "LEVEL 2 · 帶快咗喇 — 睇清楚！", 3: "LEVEL 3 · 稽查部：壞箱要彈開！", 4: "LEVEL 4 · ⚔ BOSS 箱：打字重建！", 5: "LEVEL 5 · 終極加班：全速傳送帶！" };
 var idx = 0, lives = 3, score = 0, combo = 1, bestCombo = 1, timerId = null, timeLeft = 0, locked = false, report = [];
@@ -236,11 +241,11 @@ function startTimer(sec) {
 }
 function killTimer() { clearInterval(timerId); $('belt').classList.add('paused'); }
 
-function resolve(ok, whyHtml) {
+function resolve(ok, whyHtml, action) {
   killTimer();
   locked = true;
   var f = FLOW[idx];
-  report.push({ f: f, ok: ok });
+  report.push({ f: f, ok: ok, action: action || '' });
   var fb = $('fb');
   if (ok) {
     score += 10 * combo;
@@ -268,7 +273,7 @@ function timeUp() {
   var hint = '';
   if (f.kind === 'J' && !f.good && f.fix) hint = '<div class="cor">' + f.fix + '</div>';
   if (f.kind === 'B') hint = '<div class="cor">' + f.ans + '</div>';
-  resolve(false, '<div style="margin-top:4px;">⏱ 超時！' + (f.why || '') + '</div>' + hint);
+  resolve(false, '<div style="margin-top:4px;">⏱ 超時！' + (f.why || '') + '</div>' + hint, '⏱ 超時冇作答');
 }
 function sortTo(chute) {
   if (locked) return;
@@ -276,12 +281,13 @@ function sortTo(chute) {
   if (f.kind !== 'QS') return;
   var ok = (chute === f.voice);
   var why = '';
+  var action = '你掉咗入 ' + (chute === 'A' ? 'ACTIVE 槽' : 'PASSIVE 槽');
   if (ok) {
     why = '<div style="margin-top:4px;">' + (f.why || (f.voice === 'A' ? '主語自己做動作 → ACTIVE 槽啱晒 ✅' : '主語係被動嗰個（be+V3）→ PASSIVE 槽啱晒 ✅')) + '</div>';
   } else {
     why = '<div style="margin-top:4px;">掉錯槽！' + (f.why || (f.voice === 'A' ? '呢句主語自己做動作 — 係 ACTIVE 嚟㗎！' : 'be + V3 喺度 — 主語係被動嗰個，要入 PASSIVE 槽！')) + '</div>';
   }
-  resolve(ok, why);
+  resolve(ok, why, action);
 }
 function stamp(saidGood) {
   if (locked) return;
@@ -289,13 +295,14 @@ function stamp(saidGood) {
   if (f.kind !== 'J') return;
   var ok = (saidGood === f.good);
   var why;
+  var action = '你㩒咗 ' + (saidGood ? '✔ 放行' : '✘ 彈開');
   if (ok) {
     why = '<div style="margin-top:4px;">稽查正確！' + f.why + '</div>';
   } else {
     why = '<div style="margin-top:4px;">稽查錯！' + (f.good ? '呢句其實係啱嘅 — ' : '呢句其實係壞嘅 — ') + f.why + '</div>';
     if (!f.good && f.fix) why += '<div class="cor">' + f.fix + '</div>';
   }
-  resolve(ok, why);
+  resolve(ok, why, action);
 }
 function checkBoss() {
   if (locked) return;
@@ -303,10 +310,11 @@ function checkBoss() {
   if (f.kind !== 'B') return;
   var val = norm($('bossIn').value);
   if (val === '') return;
+  var action = '你打成：「' + $('bossIn').value.trim() + '」';
   if (f.accept.indexOf(val) !== -1) {
-    resolve(true, '<div style="margin-top:4px;">BOSS 擊倒！⚔ ' + f.why + '</div>');
+    resolve(true, '<div style="margin-top:4px;">BOSS 擊倒！⚔ ' + f.why + '</div>', action);
   } else {
-    resolve(false, '<div class="cor">正確重建：' + f.ans + '</div><div style="margin-top:4px;">' + f.why + '</div>');
+    resolve(false, '<div class="cor">正確重建：' + f.ans + '</div><div style="margin-top:4px;">' + f.why + '</div>', action);
   }
 }
 function advance() {
@@ -331,22 +339,27 @@ function endGame(won) {
   $('game').classList.add('hidden');
   $('end').classList.remove('hidden');
   var done = report.filter(function(r) { return r.ok; }).length;
-  var pct = Math.round(done / FLOW.length * 100);
   var emoji = won ? (score >= 350 ? '🏆' : '🎉') : '💔';
   var title = won ? '今日訂單完成！' : '今日好多人手受傷… 下次再嚟！';
   $('endEmoji').textContent = emoji;
-  $('endScore').textContent = title + ' 💰 ' + score + ' 分 · 出貨 ' + done + '/20 箱 · 最高連擊 🔥x' + bestCombo;
-  var stars = won ? (score >= 350 ? '⭐⭐⭐ 工場大亨！可以直接做功課 — 每一題都係新一局！' : score >= 220 ? '⭐⭐ 唔錯！錯嗰啲箱上面有解釋，睇明再開工就滿分。' : '⭐ 完成咗 — 玩多次，今次逐句講一次「主語做唔做動作？」先揀槽。')
-    : '唔緊要 — 下面係今日嘅出貨紀錄，睇明每一箱嘅正確答案，聽日再返工！';
+  $('endScore').textContent = title + ' 💰 ' + score + ' 分 · 出貨 ' + done + '/' + FLOW.length + ' 箱 · 最高連擊 🔥x' + bestCombo;
+  var stars = won ? (score >= 350 ? '⭐⭐⭐ 工場大亨！可以直接做功課 — 每一題都係新一局！' : score >= 220 ? '⭐⭐ 唔錯！下面紅色嗰啲箱睇明再開工就滿分。' : '⭐ 完成咗 — 玩多次，逐句講一次「主語做唔做動作？」先掟槽。')
+    : '唔緊要 — 下面係今日嘅出貨紀錄：你做咗乜 vs 正確做法，睇明聽日再返工！';
   $('endMsg').innerHTML = stars;
   var g = $('endgrid');
   g.innerHTML = '';
   report.forEach(function(r, i) {
-    var d = document.createElement('div');
-    d.className = 'endrow';
     var f = r.f;
+    var d = document.createElement('div');
+    d.className = 'endrow ' + (r.ok ? 'good' : 'bad');
     var tag = f.kind === 'J' ? '稽查' : f.kind === 'B' ? 'BOSS' : '分揀';
-    d.innerHTML = (r.ok ? '✅' : '💥') + ' <b>' + tag + ' L' + f.lvl + '</b> ' + f.s + (r.ok ? '' : (f.kind === 'J' ? (f.good ? ' — 其實係 ✔ 啱嘅' : ' → <b>' + (f.fix || '') + '</b>') : f.kind === 'B' ? ' → <b>' + f.ans + '</b>' : ' → 應該入 <b>' + (f.voice === 'A' ? 'ACTIVE' : 'PASSIVE') + '</b> 槽'));
+    var right;
+    if (f.kind === 'J') right = f.good ? '正確：✔ 放行（句係啱嘅）' : '正確：✘ 彈開 → ' + (f.fix || '');
+    else if (f.kind === 'B') right = '正確重建：' + f.ans;
+    else right = '正確：掉入 ' + (f.voice === 'A' ? 'ACTIVE' : 'PASSIVE') + ' 槽';
+    d.innerHTML = (r.ok ? '✅' : '❌') + ' <b>箱 ' + (i + 1) + ' · ' + tag + ' L' + f.lvl + '</b> ' + f.s
+      + '<br><span class="yours">' + (r.action || '（冇紀錄）') + '</span>'
+      + (r.ok ? '' : '<br><span class="right">' + right + '</span><span class="why"> · 💡 ' + (f.why || '') + '</span>');
     g.appendChild(d);
   });
 }
