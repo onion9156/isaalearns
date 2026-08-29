@@ -19,7 +19,7 @@
   .typein:focus { outline: 2px solid #7c3aed; }
   .typehint { font-size: 10.5px; color: #94a3b8; margin-top: 4px; }
   .ansbox { margin-top: 16px; background: #f1f5f9; border-left: 5px solid #16a34a; border-radius: 10px; padding: 13px 15px; display: none; }
-  .ansbox.show { display: block; }
+  .ansbox.show { display: block; animation: slideup .28s ease; }
   .ansbox .ans { font-size: 15.5px; font-weight: 900; color: #14532d; line-height: 1.55; }
   .ansbox .tip { font-size: 12.5px; color: #475569; line-height: 1.65; margin-top: 6px; }
   .big { width: 100%; border: 0; border-radius: 13px; padding: 15px 0; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 16px; }
@@ -42,6 +42,10 @@
   .rrow .why { color: #b45309; }
   .again { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border: 0; border-radius: 13px; padding: 15px 40px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 20px; }
   .foot { text-align: center; font-size: 10.5px; color: #a5b4fc; margin-top: 14px; line-height: 1.7; }
+
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  .shakeit { animation: shake .4s; }
+  @keyframes slideup { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -120,6 +124,7 @@ function reveal(){
   $('markrow').classList.add('show');
 }
 function mark(got){
+  if (!got){ var c = document.getElementById('qcard'); c.classList.remove('shakeit'); void c.offsetWidth; c.classList.add('shakeit'); }
   results.push({ n: i + 1, got: got, card: CARDS[i], typed: typedAns || '（口頭作答）' });
   if (got) { score++; }
   if (i < CARDS.length - 1) { i++; showQ(); } else { finish(); }
