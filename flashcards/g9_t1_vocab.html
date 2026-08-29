@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 9 Vocab Master - Glass Edition</title>
+    <meta name="description" content="Isaac's Grade 9 Term 1 vocabulary flashcards — G.T. Reading & Headway, organised by week, with word families.">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --primary-text: #ffffff;
+            --accent-yellow: #ffee58;
+            --accent-blue: #81d4fa;
+            --card-front: rgba(255, 255, 255, 0.2);
+            --card-back: rgba(255, 253, 231, 0.95);
+            --text-dark: #1a237e;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            background-attachment: fixed;
+            color: var(--primary-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .site-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--accent-yellow);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #vocabSearch {
+            width: 100%;
+            padding: 15px 50px 15px 25px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        #vocabSearch:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(129, 212, 250, 0.3);
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .clear-search:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .week-title {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--accent-yellow);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border-left: 5px solid var(--accent-yellow);
+            padding-left: 15px;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 50px;
+            padding: 20px 0;
+        }
+
+        .stack-wrapper {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .card-stack {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            transition: 0.5s ease;
+            transform-style: preserve-3d;
+        }
+
+        .card-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-front);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform-style: preserve-3d;
+        }
+
+        .card-item:nth-child(2) { transform: translate(6px, 6px); z-index: -1; opacity: 0.8; }
+        .card-item:nth-child(3) { transform: translate(12px, 12px); z-index: -2; opacity: 0.6; }
+        .card-item:nth-child(n+4) { display: none; }
+
+        .card-stack:hover .card-item:nth-child(2) { transform: translate(12px, 12px); }
+        .card-stack:hover .card-item:nth-child(3) { transform: translate(24px, 24px); }
+
+        #focusOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(0px);
+            transition: opacity 0.4s ease, backdrop-filter 0.4s ease, visibility 0s linear 0.4s;
+        }
+
+        #focusOverlay.active {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            backdrop-filter: blur(20px);
+            transition: opacity 0.4s ease, backdrop-filter 0.4s ease, visibility 0s linear 0s;
+        }
+
+        .focus-container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            opacity: 0;
+            transform-origin: center center;
+        }
+
+        .focus-container.animate-in {
+            opacity: 1;
+            transform: translate(0, 0) scale(1) !important;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        }
+
+        .focus-card {
+            min-height: 250px;
+            position: relative;
+            perspective: 1000px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .focus-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .focus-card.flipped .focus-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+            border: 1px solid var(--glass-border);
+        }
+
+        .face-front {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            align-items: center;
+        }
+
+        .face-back {
+            background: var(--card-back);
+            color: var(--text-dark);
+            transform: rotateY(180deg);
+            text-align: left;
+        }
+
+        .word-main { font-size: 2rem; font-weight: 800; color: var(--accent-blue); margin: 0; }
+        .pos-badge { background: var(--accent-blue); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-top: 10px; }
+        .family-label { position: absolute; top: 15px; left: 15px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+
+        .chi-def { font-size: 1.4rem; color: #d32f2f; font-weight: bold; margin-bottom: 15px; }
+        .eng-def { font-size: 1rem; line-height: 1.5; margin-bottom: 15px; color: #444; }
+        .ex-sentence { font-style: italic; color: #555; border-left: 4px solid var(--accent-blue); padding-left: 15px; font-size: 0.95rem; }
+
+        .close-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            color: white;
+            font-size: 3rem;
+            cursor: pointer;
+            z-index: 2001;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.2s;
+        }
+
+        #focusOverlay.active .close-btn {
+            opacity: 1;
+        }
+
+        .focus-container::-webkit-scrollbar { width: 8px; }
+        .focus-container::-webkit-scrollbar-track { background: transparent; }
+        .focus-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        @media (max-width: 600px) {
+            .vocab-grid { grid-template-columns: 1fr; }
+            .focus-container { padding: 10px; }
+            .word-main { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="site-title">★ Grade 9 · Term 1 Vocab Master ★</div>
+    <div class="search-box">
+        <input type="text" id="vocabSearch" placeholder="搜尋單字、週數或中文 (e.g. Week 5, 騙子)" onkeyup="filterVocabs()">
+        <span class="clear-search" id="clearBtn" onclick="clearSearch()">&times;</span>
+    </div>
+</header>
+
+<div id="focusOverlay" onclick="closeFocus()">
+    <span class="close-btn">&times;</span>
+    <div class="focus-container" onclick="event.stopPropagation()">
+        <!-- Expanded cards appear here -->
+    </div>
+</div>
+
+<div class="container" id="mainApp">
+    <!-- Main content injected here -->
+</div>
+
+<script>
+    const allData = [
+        {
+            week: "Week 5: G.T. Reading",
+            items: [
+                { root: "Social injustice", pos: "phrase", chi: "<社會不公>", eng: "Unfair treatment of people in society, such as poverty or unequal laws.", ex: "The novel exposes the social injustice of Victorian London.", family: [
+                    { word: "Injustice", pos: "n", chi: "<不公義>", eng: "Lack of fairness or justice.", ex: "Fighting against injustice is everyone's duty." },
+                    { word: "Justice", pos: "n", chi: "<公義; 司法>", eng: "Fair treatment of people according to the law.", ex: "The court finally delivered justice." },
+                    { word: "Unjust", pos: "adj", chi: "<不公正的>", eng: "Not fair or reasonable.", ex: "An unjust law should be changed." }
+                ]},
+                { root: "Plead", pos: "v", chi: "<懇求; 認罪>", eng: "To beg urgently for something; to answer a charge in court.", ex: "Oliver pleaded for another bowl of soup.", family: [
+                    { word: "Plea", pos: "n", chi: "<懇求; 抗辯>", eng: "An urgent and emotional request.", ex: "The judge ignored his plea for mercy." },
+                    { word: "Pleading", pos: "adj", chi: "<懇求的>", eng: "Begging in an urgent, emotional way.", ex: "She gave him a pleading look." }
+                ]},
+                { root: "Threaten", pos: "v", chi: "<威脅>", eng: "To say that you will cause harm or trouble.", ex: "The thief threatened the boy with a knife.", family: [
+                    { word: "Threat", pos: "n", chi: "<威脅>", eng: "A statement that you will harm someone.", ex: "His words were clearly a threat." },
+                    { word: "Threatening", pos: "adj", chi: "<有威脅性的>", eng: "Showing that harm is likely.", ex: "He sent a threatening letter to the shopkeeper." },
+                    { word: "Threateningly", pos: "adv", chi: "<威脅地>", eng: "In a way that shows harm is likely.", ex: "He raised the stick threateningly." }
+                ]},
+                { root: "Wander around", pos: "phr v", chi: "<到處遊盪>", eng: "To walk around slowly with no special purpose.", ex: "Oliver wandered around the dark streets alone.", family: [
+                    { word: "Wander", pos: "v", chi: "<漫遊; 徘徊>", eng: "To walk about without a fixed path.", ex: "We wandered through the night market." },
+                    { word: "Wanderer", pos: "n", chi: "<流浪者>", eng: "A person who travels around with no home.", ex: "The lonely wanderer slept in the park." }
+                ]},
+                { root: "Notorious", pos: "adj", chi: "<惡名昭彰的>", eng: "Famous for something bad.", ex: "Fagin was a notorious receiver of stolen goods.", family: [
+                    { word: "Notoriety", pos: "n", chi: "<惡名>", eng: "The state of being famous for something bad.", ex: "The gang quickly gained notoriety." },
+                    { word: "Notoriously", pos: "adv", chi: "<惡名昭彰地>", eng: "Known widely for something bad.", ex: "That junction is notoriously dangerous." }
+                ]},
+                { root: "Illiterate", pos: "adj", chi: "<不識字的>", eng: "Unable to read or write.", ex: "Many poor children in the 1800s were illiterate.", family: [
+                    { word: "Illiteracy", pos: "n", chi: "<文盲; 不識字>", eng: "The inability to read or write.", ex: "Illiteracy was common in the workhouse." },
+                    { word: "Literate", pos: "adj", chi: "<識字的>", eng: "Able to read and write.", ex: "By twelve, the boy was fully literate." },
+                    { word: "Literacy", pos: "n", chi: "<讀寫能力>", eng: "The ability to read and write.", ex: "The charity promotes literacy in poor areas." }
+                ]},
+                { root: "Mystical", pos: "adj", chi: "<神秘的>", eng: "Having a magical or spiritual quality that is hard to explain.", ex: "An old, mystical mist covered the moors.", family: [
+                    { word: "Mystery", pos: "n", chi: "<謎; 神秘事物>", eng: "Something strange that cannot be explained.", ex: "The missing ring remains a mystery." },
+                    { word: "Mystic", pos: "adj", chi: "<神秘的; 玄奧的>", eng: "Spiritual and mysterious.", ex: "The temple was famous for its mystic rituals." }
+                ]},
+                { root: "Sinister", pos: "adj", chi: "<邪惡的; 不祥的>", eng: "Seeming evil, dangerous, or about to cause harm.", ex: "A sinister figure watched us from the shadows." },
+                { root: "Supercilious", pos: "adj", chi: "<傲慢的; 目中無人的>", eng: "Behaving as if you are better than other people.", ex: "The supercilious clerk refused to help the poor boy.", family: [
+                    { word: "Superciliously", pos: "adv", chi: "<傲慢地>", eng: "In a proud way that shows you feel superior.", ex: "He looked superciliously at the beggar." },
+                    { word: "Superciliousness", pos: "n", chi: "<傲慢; 自負>", eng: "The quality of feeling superior to others.", ex: "His superciliousness annoyed the whole class." }
+                ]},
+                { root: "Extraordinary", pos: "adj", chi: "<非凡的; 驚人的>", eng: "Very unusual, special, or amazing.", ex: "It was an extraordinary escape from the fire.", family: [
+                    { word: "Extraordinarily", pos: "adv", chi: "<非凡地>", eng: "In an unusual and amazing way.", ex: "She sang extraordinarily well at the concert." },
+                    { word: "Ordinary", pos: "adj", chi: "<平凡的; 普通的>", eng: "Normal, with nothing special about it.", ex: "It began as an ordinary school day." }
+                ]},
+                { root: "Soiling", pos: "v (ing)", chi: "<弄髒>", eng: "Making something dirty.", ex: "He was scolded for soiling his only uniform.", family: [
+                    { word: "Soil", pos: "v/n", chi: "<弄髒; 泥土>", eng: "To make something dirty; the top layer of earth.", ex: "Mud soiled her new white shoes." },
+                    { word: "Soiled", pos: "adj", chi: "<髒污的>", eng: "Made dirty.", ex: "He changed out of his soiled shirt." }
+                ]},
+                { root: "Gobble", pos: "v", chi: "<狼吞虎嚥>", eng: "To eat food very quickly and greedily.", ex: "The starving boys gobbled down their gruel.", family: [
+                    { word: "Gobble up", pos: "phr v", chi: "<狼吞虎嚥地吃光>", eng: "To eat all of something very quickly.", ex: "He gobbled up the whole birthday cake." }
+                ]}
+            ]
+        },
+        {
+            week: "Week 6: Headway",
+            items: [
+                { root: "Tilt", pos: "v/n", chi: "<傾斜>", eng: "To lean to one side; a slight lean.", ex: "The old picture tilted on the wall.", family: [
+                    { word: "Tilted", pos: "adj", chi: "<傾斜的>", eng: "Leaning to one side.", ex: "He listened with his head tilted to one side." },
+                    { word: "At full tilt", pos: "phrase", chi: "<全速地>", eng: "Moving as fast as possible.", ex: "The motorbike raced past at full tilt." }
+                ]},
+                { root: "Expectation", pos: "n", chi: "<期望>", eng: "A belief that something will or should happen.", ex: "The film exceeded all my expectations.", family: [
+                    { word: "Expect", pos: "v", chi: "<預料; 期望>", eng: "To think that something will happen.", ex: "I expect the results to arrive tomorrow." },
+                    { word: "Unexpected", pos: "adj", chi: "<意想不到的>", eng: "Not expected or planned.", ex: "An unexpected visitor knocked on the door." },
+                    { word: "Unexpectedly", pos: "adv", chi: "<意想不到地>", eng: "In a surprising way.", ex: "He arrived unexpectedly early." }
+                ]},
+                { root: "Glare", pos: "v/n", chi: "<怒視; 強光>", eng: "To stare angrily; a harsh, bright light.", ex: "The teacher glared at the noisy class.", family: [
+                    { word: "Glaring", pos: "adj", chi: "<明顯的; 怒視的>", eng: "Very obvious and hard to miss.", ex: "There was a glaring mistake in my essay." }
+                ]},
+                { root: "Fateful", pos: "adj", chi: "<關鍵的; 命中註定的>", eng: "Having an important effect on the future, often something bad.", ex: "It was a fateful decision to board that ship.", family: [
+                    { word: "Fate", pos: "n", chi: "<命運>", eng: "The power believed to control what happens.", ex: "It was fate that they met at the station." },
+                    { word: "Fatal", pos: "adj", chi: "<致命的>", eng: "Causing death.", ex: "The driver was badly hurt but nobody died — it was not fatal." },
+                    { word: "Fatally", pos: "adv", chi: "<致命地>", eng: "In a way that causes death.", ex: "He was fatally injured in the crash." }
+                ]},
+                { root: "Strike gold", pos: "phrase", chi: "<發掘到寶藏; 大發一筆>", eng: "To suddenly find great success, wealth, or value.", ex: "The young company struck gold with its first app." },
+                { root: "Fend for", pos: "phr v", chi: "<自力照顧(自己)>", eng: "To look after yourself without anyone's help.", ex: "Left alone, the puppies had to fend for themselves.", family: [
+                    { word: "Fend off", pos: "phr v", chi: "<擋開; 避開>", eng: "To defend yourself against an attack or question.", ex: "She fended off the reporters' questions." }
+                ]},
+                { root: "Gloomy", pos: "adj", chi: "<陰暗的; 憂鬱的>", eng: "Dark, grey, and depressing.", ex: "A gloomy sky hung over the city all week.", family: [
+                    { word: "Gloom", pos: "n", chi: "<陰暗; 憂鬱>", eng: "Darkness or a feeling of sadness.", ex: "The exam results cast a gloom over the class." },
+                    { word: "Gloomily", pos: "adv", chi: "<陰沉地>", eng: "In a sad and dark way.", ex: "'We lost again,' he said gloomily." }
+                ]},
+                { root: "Benefactor", pos: "n", chi: "<恩人; 捐助人>", eng: "A person who gives money or help to support others.", ex: "A secret benefactor paid for Pip's education.", family: [
+                    { word: "Benefit", pos: "n/v", chi: "<利益; 受益>", eng: "An advantage; to gain something good.", ex: "Regular exercise benefits your health." },
+                    { word: "Beneficial", pos: "adj", chi: "<有益的>", eng: "Good for your health or situation.", ex: "Sunshine is beneficial to plants." },
+                    { word: "Benevolent", pos: "adj", chi: "<仁慈的; 樂善好施的>", eng: "Kind, generous, and wishing to do good.", ex: "A benevolent donor funded the new library." }
+                ]},
+                { root: "Swindler", pos: "n", chi: "<騙子>", eng: "A person who cheats others to get their money.", ex: "The swindler sold fake tickets to tourists.", family: [
+                    { word: "Swindle", pos: "v", chi: "<詐騙>", eng: "To cheat someone in order to get money.", ex: "He swindled the old lady out of her savings." }
+                ]},
+                { root: "Devastating", pos: "adj", chi: "<毀滅性的>", eng: "Causing great damage, harm, or shock.", ex: "A devastating typhoon struck the coast.", family: [
+                    { word: "Devastate", pos: "v", chi: "<摧毁; 使震驚>", eng: "To destroy completely; to shock someone deeply.", ex: "The flood devastated the whole village." },
+                    { word: "Devastated", pos: "adj", chi: "<極度傷心; 被摧毁的>", eng: "Extremely shocked and sad.", ex: "She was devastated by the exam results." },
+                    { word: "Devastation", pos: "n", chi: "<毁滅; 廢墟>", eng: "Great destruction or damage.", ex: "The storm left devastation behind it." }
+                ]},
+                { root: "Isolate", pos: "v", chi: "<使隔絕; 使孤立>", eng: "To keep someone or something apart from others.", ex: "The tiny island was isolated from the mainland.", family: [
+                    { word: "Isolated", pos: "adj", chi: "<偏遠的; 孤立的>", eng: "Far away from other places or people.", ex: "They lived in an isolated village in the hills." },
+                    { word: "Isolation", pos: "n", chi: "<隔絕; 孤立>", eng: "The state of being alone or apart.", ex: "He studied in isolation for the whole summer." }
+                ]},
+                { root: "Scandal", pos: "n", chi: "<醜聞>", eng: "An action or event that shocks people because it is immoral.", ex: "The bribery scandal filled the front pages.", family: [
+                    { word: "Scandalous", pos: "adj", chi: "<可恥的; 有醜聞的>", eng: "Shocking and morally wrong.", ex: "He told a scandalous lie about his rival." }
+                ]}
+            ]
+        },
+        {
+            week: "Week 8: G.T. Reading",
+            items: [
+                { root: "Apprentice", pos: "n", chi: "<學徒>", eng: "A young person who works for a skilled master to learn a trade.", ex: "Pip was to become a blacksmith's apprentice.", family: [
+                    { word: "Apprenticeship", pos: "n", chi: "<學徒期; 見習期>", eng: "The period of time spent learning as an apprentice.", ex: "His apprenticeship lasted six long years." }
+                ]},
+                { root: "Convict", pos: "n/v", chi: "<囚犯; 定罪>", eng: "A person serving a prison sentence; to find someone guilty.", ex: "The escaped convict hid in the marshes.", family: [
+                    { word: "Conviction", pos: "n", chi: "<定罪; 堅信>", eng: "A decision that someone is guilty; a strong belief.", ex: "He has a conviction for theft." }
+                ]},
+                { root: "Hierarchy", pos: "n", chi: "<等級制度>", eng: "A system that ranks people from highest to lowest.", ex: "The ship had a strict social hierarchy.", family: [
+                    { word: "Hierarchical", pos: "adj", chi: "<有等級的>", eng: "Arranged in levels of importance.", ex: "Victorian society was highly hierarchical." }
+                ]},
+                { root: "Sleeping rough", pos: "phrase", chi: "<露宿街頭>", eng: "Sleeping outdoors because you have no home.", ex: "He was sleeping rough under the railway bridge.", family: [
+                    { word: "Rough", pos: "adj", chi: "<粗糙的; 艱苦的>", eng: "Not smooth; difficult or unpleasant.", ex: "The refugees had a rough journey." },
+                    { word: "Roughly", pos: "adv", chi: "<大約; 粗暴地>", eng: "About, not exactly; not gently.", ex: "Roughly two hundred people joined the march." }
+                ]},
+                { root: "Grasp", pos: "v/n", chi: "<抓住; 領悟>", eng: "To hold tightly; to fully understand something.", ex: "She quickly grasped the new grammar rule.", family: [
+                    { word: "Grasping", pos: "adj", chi: "<貪婪的>", eng: "Greedy for money.", ex: "A grasping moneylender tricked the poor family." }
+                ]},
+                { root: "Venture", pos: "v/n", chi: "<冒險前往; 冒險事業>", eng: "To risk going somewhere or doing something dangerous.", ex: "They ventured out into the storm to find their dog." },
+                { root: "Collapsed", pos: "v (past)", chi: "<倒塌; 暈倒>", eng: "Fell down suddenly; failed suddenly.", ex: "The rotten floor collapsed under his feet.", family: [
+                    { word: "Collapse", pos: "v/n", chi: "<倒塌; 崩潰>", eng: "To fall down or fail suddenly.", ex: "He collapsed from exhaustion after the race." }
+                ]},
+                { root: "Patronizing", pos: "adj", chi: "<居高臨下的>", eng: "Treating others as if they are less important or clever.", ex: "Estella spoke to Pip in a patronizing tone.", family: [
+                    { word: "Patronize", pos: "v", chi: "<屈尊對待; 光顧>", eng: "To treat someone as if they are inferior; to be a regular customer of a shop.", ex: "Stop patronizing me — I understand perfectly!" },
+                    { word: "Patron", pos: "n", chi: "<贊助人; 顧客>", eng: "A person who supports artists or charities; a customer.", ex: "She was a generous patron of the arts." }
+                ]},
+                { root: "Prejudice", pos: "n/v", chi: "<偏見>", eng: "An unfair opinion about a person or group, not based on reason.", ex: "Prejudice against the poor was common in that era.", family: [
+                    { word: "Prejudiced", pos: "adj", chi: "<有偏見的>", eng: "Having an unfair opinion about others.", ex: "He is prejudiced against people he has never met." }
+                ]},
+                { root: "Lethal", pos: "adj", chi: "<致命的>", eng: "Able to cause death.", ex: "A lethal dose of the poison killed the rats." },
+                { root: "Pristine", pos: "adj", chi: "<潔淨如新的; 原始的>", eng: "Perfectly clean, fresh, and untouched.", ex: "The island's pristine beaches attract many visitors." },
+                { root: "Clogging", pos: "v (ing)", chi: "<阻塞>", eng: "Blocking a pipe, passage, or road.", ex: "Fallen leaves were clogging the drain.", family: [
+                    { word: "Clog", pos: "v/n", chi: "<堵塞; 堵塞物>", eng: "To block something; a blockage.", ex: "Hair clogged the bathroom sink." },
+                    { word: "Clogged", pos: "adj", chi: "<堵塞的>", eng: "Blocked so that nothing can pass through.", ex: "A clogged drain caused the flood." }
+                ]}
+            ]
+        },
+        {
+            week: "Week 11: Headway",
+            items: [
+                { root: "Prosperous", pos: "adj", chi: "<繁榮的; 富足的>", eng: "Rich and successful.", ex: "Hong Kong grew into a prosperous trading city.", family: [
+                    { word: "Prosper", pos: "v", chi: "<繁榮; 興旺>", eng: "To become successful and rich.", ex: "The little shop prospered under new management." },
+                    { word: "Prosperity", pos: "n", chi: "<繁榮>", eng: "The state of being successful and rich.", ex: "The port brought prosperity to the region." }
+                ]},
+                { root: "Dismal", pos: "adj", chi: "<陰沉的; 悽涼的>", eng: "Gloomy, grey, and depressing.", ex: "The weather was dismal throughout the camp.", family: [
+                    { word: "Dismally", pos: "adv", chi: "<陰沉地; 沉悶地>", eng: "In a gloomy or disappointing way.", ex: "The team performed dismally in the final." }
+                ]},
+                { root: "Sanitation", pos: "n", chi: "<公共衛生(設施)>", eng: "Systems that supply clean water and remove waste safely.", ex: "Poor sanitation spread disease through the slums.", family: [
+                    { word: "Sanitary", pos: "adj", chi: "<衛生的>", eng: "Clean and free from germs.", ex: "The kitchen failed its sanitary inspection." },
+                    { word: "Sanitize", pos: "v", chi: "<消毒>", eng: "To make something completely clean and germ-free.", ex: "Please sanitize your hands before eating." }
+                ]},
+                { root: "Horde", pos: "n", chi: "<一大群(人)>", eng: "A huge, noisy, disorderly crowd.", ex: "A horde of fans rushed towards the stage." },
+                { root: "Settle down", pos: "phr v", chi: "<定居; 安定下來>", eng: "To make a permanent home and live quietly.", ex: "After years abroad, they settled down in Kwun Tong.", family: [
+                    { word: "Settle", pos: "v", chi: "<定居; 解決>", eng: "To make a home somewhere; to end an argument.", ex: "The family settled in a quiet coastal town." },
+                    { word: "Settlement", pos: "n", chi: "<定居點; 協議>", eng: "A small new community; an agreement that ends a dispute.", ex: "Archaeologists found an ancient settlement on the hill." },
+                    { word: "Settler", pos: "n", chi: "<移居者; 拓荒者>", eng: "A person who moves to a new place to live there.", ex: "The first settlers arrived by fishing boat." }
+                ]},
+                { root: "Slums", pos: "n", chi: "<貧民窟>", eng: "Very poor, crowded, and run-down city areas.", ex: "Millions of people lived in the slums of Mumbai." },
+                { root: "Undermine", pos: "v", chi: "<逐漸削弱; 損害>", eng: "To weaken something gradually, often in a secret way.", ex: "Constant lies undermined her trust in him." },
+                { root: "Skeptical", pos: "adj", chi: "<懷疑的>", eng: "Doubting that something is true or useful.", ex: "I am skeptical about his promise to change.", family: [
+                    { word: "Skeptic", pos: "n", chi: "<懷疑者>", eng: "A person who doubts claims or ideas.", ex: "Skeptics demanded proof of the miracle cure." },
+                    { word: "Skepticism", pos: "n", chi: "<懷疑態度>", eng: "An attitude of doubting the truth of something.", ex: "The plan was met with widespread skepticism." },
+                    { word: "Skeptically", pos: "adv", chi: "<懷疑地>", eng: "In a doubting way.", ex: "She raised one eyebrow skeptically." }
+                ]},
+                { root: "Premonition", pos: "n", chi: "<預感(尤其不祥)>", eng: "A strong feeling that something bad is about to happen.", ex: "She had a premonition of disaster before the trip." },
+                { root: "Stagger", pos: "v", chi: "<蹣跚; 使震驚>", eng: "To walk unsteadily as if about to fall; to shock deeply.", ex: "The tired boxer staggered back to his corner.", family: [
+                    { word: "Staggering", pos: "adj", chi: "<驚人的; 搖晃的>", eng: "So large or shocking that it is hard to believe.", ex: "A staggering two million dollars was raised." }
+                ]},
+                { root: "Swirling", pos: "v (ing)", chi: "<打旋; 盤繞>", eng: "Moving round and round in a twisting pattern.", ex: "Golden dust was swirling in the autumn wind.", family: [
+                    { word: "Swirl", pos: "v/n", chi: "<旋轉; 漩渦>", eng: "To move in a twisting circular motion; a twisting shape.", ex: "The water swirled down the drain." }
+                ]},
+                { root: "Impose", pos: "v", chi: "<強加; 實施>", eng: "To force a rule, tax, or belief on other people.", ex: "A night curfew was imposed during the typhoon.", family: [
+                    { word: "Imposition", pos: "n", chi: "<強加; 不公平負擔>", eng: "A rule or burden forced on someone; an unfair request.", ex: "The new levy was seen as an imposition." },
+                    { word: "Imposing", pos: "adj", chi: "<壯觀的; 威嚴的>", eng: "Grand, large, and impressive in appearance.", ex: "An imposing stone building guarded the harbour." }
+                ]}
+            ]
+        }
+    ];
+
+    function renderMainGrid(data = allData) {
+        const container = document.getElementById('mainApp');
+        container.innerHTML = '';
+
+        data.forEach(section => {
+            const sec = document.createElement('div');
+            const count = section.items.length;
+            sec.innerHTML = `<h2 class="week-title">${section.week} <span style="font-size:0.9rem;color:rgba(255,255,255,0.4)">· ${count} headwords</span></h2>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'vocab-grid';
+
+            section.items.forEach(item => {
+                const stackWrapper = document.createElement('div');
+                stackWrapper.className = 'stack-wrapper';
+                stackWrapper.onclick = (e) => openFocus(item, e.currentTarget);
+
+                const stack = document.createElement('div');
+                stack.className = 'card-stack';
+
+                const stackLabel = (item.pos && item.pos.indexOf('phr') !== -1) || (item.pos && item.pos.indexOf('phrase') !== -1) ? 'PHRASE' : 'ROOT';
+
+                let stackContent = `
+                    <div class="card-item">
+                        <span class="family-label">${stackLabel}</span>
+                        <h3 class="word-main" style="font-size:1.4rem">${item.root}</h3>
+                        <span class="pos-badge">${item.pos}</span>
+                    </div>
+                `;
+                if (item.family) {
+                    item.family.forEach((f, idx) => {
+                        if (idx < 2) {
+                            stackContent += `<div class="card-item"></div>`;
+                        }
+                    });
+                }
+
+                stack.innerHTML = stackContent;
+                stackWrapper.appendChild(stack);
+                grid.appendChild(stackWrapper);
+            });
+
+            sec.appendChild(grid);
+            container.appendChild(sec);
+        });
+    }
+
+    function openFocus(item, originElement) {
+        const overlay = document.getElementById('focusOverlay');
+        const container = overlay.querySelector('.focus-container');
+
+        container.classList.remove('animate-in');
+        container.innerHTML = '';
+
+        if (originElement) {
+            const rect = originElement.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            const screenX = window.innerWidth / 2;
+            const screenY = window.innerHeight / 2;
+            const deltaX = originX - screenX;
+            const deltaY = originY - screenY;
+
+            container.style.transition = 'none';
+            container.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.2)`;
+        }
+
+        const stackLabel = (item.pos && item.pos.indexOf('phr') !== -1) || (item.pos && item.pos.indexOf('phrase') !== -1) ? 'PHRASE' : 'ROOT WORD';
+
+        container.appendChild(createFocusCard(item.root, item.pos, item.chi, item.eng, item.ex, stackLabel));
+        if (item.family) {
+            item.family.forEach(f => {
+                container.appendChild(createFocusCard(f.word, f.pos, f.chi, f.eng, f.ex, 'RELATED FORM'));
+            });
+        }
+
+        overlay.classList.add('active');
+        void container.offsetHeight;
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                container.style.transition = '';
+                container.style.transform = '';
+                container.classList.add('animate-in');
+            });
+        });
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function createFocusCard(word, pos, chi, eng, ex, labelText) {
+        const div = document.createElement('div');
+        div.className = 'focus-card';
+        div.onclick = function() { this.classList.toggle('flipped'); };
+        div.innerHTML = `
+            <div class="focus-card-inner">
+                <div class="face face-front">
+                    <span class="family-label">${labelText}</span>
+                    <h2 class="word-main">${word}</h2>
+                    <span class="pos-badge">${pos}</span>
+                    <div style="margin-top:20px; font-size:0.7rem; color:rgba(255,255,255,0.4)">CLICK TO FLIP</div>
+                </div>
+                <div class="face face-back">
+                    <div class="chi-def">${chi}</div>
+                    <div class="eng-def">${eng}</div>
+                    <div class="ex-sentence">"${ex}"</div>
+                </div>
+            </div>
+        `;
+        return div;
+    }
+
+    function closeFocus() {
+        const overlay = document.getElementById('focusOverlay');
+        const container = overlay.querySelector('.focus-container');
+        overlay.classList.remove('active');
+        container.classList.remove('animate-in');
+        document.body.style.overflow = 'auto';
+    }
+
+    function filterVocabs() {
+        const searchInput = document.getElementById('vocabSearch');
+        const clearBtn = document.getElementById('clearBtn');
+        const query = searchInput.value.toLowerCase();
+
+        if (query.length > 0) {
+            clearBtn.style.display = 'flex';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+
+        const filtered = allData.map(section => {
+            return {
+                ...section,
+                items: section.items.filter(item => {
+                    const matchRoot = item.root.toLowerCase().includes(query);
+                    const matchChi = item.chi.toLowerCase().includes(query);
+                    const matchEng = item.eng.toLowerCase().includes(query);
+                    const matchWeek = section.week.toLowerCase().includes(query);
+                    const matchFamily = item.family && item.family.some(f =>
+                        f.word.toLowerCase().includes(query) || f.chi.toLowerCase().includes(query));
+                    return matchRoot || matchChi || matchEng || matchWeek || matchFamily;
+                })
+            };
+        }).filter(section => section.items.length > 0);
+
+        renderMainGrid(filtered);
+    }
+
+    function clearSearch() {
+        const searchInput = document.getElementById('vocabSearch');
+        searchInput.value = '';
+        filterVocabs();
+        searchInput.focus();
+    }
+
+    window.onload = () => renderMainGrid();
+</script>
+
+</body>
+</html>
