@@ -32,7 +32,7 @@
   .prompt { font-size: 11.5px; color: #64748b; font-weight: 700; }
   .fb { border-radius: 12px; padding: 11px 14px; font-size: 13px; line-height: 1.55; margin-top: 10px; display: none; }
   .fb.good { background: #dcfce7; border: 2px solid #16a34a; display: block; }
-  .fb.bad { background: #fee2e2; border: 2px solid #dc2626; display: block; }
+  .fb.bad { background: #fee2e2; border: 2px solid #dc2626; display: block; animation: slideup .28s ease; }
   .fb .why { font-weight: 700; }
   .next { width: 100%; border: 0; background: #0f766e; color: #fff; border-radius: 12px; padding: 13px; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 10px; display: none; }
   .hidden { display: none !important; }
@@ -40,6 +40,10 @@
   .endchip { background: #eef2ff; color: #3730a3; border-radius: 10px; padding: 8px 13px; font-size: 12.5px; font-weight: 800; }
   .foot { text-align: center; font-size: 10.5px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
   .whybox { background: #fffbeb; border: 1.5px dashed #d97706; border-radius: 10px; padding: 9px 12px; font-size: 12.5px; color: #713f12; line-height: 1.6; margin-top: 10px; text-align: left; }
+
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  .shakeit { animation: shake .4s; }
+  @keyframes slideup { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -169,6 +173,7 @@ function slap(zone) {
     $('fb').innerHTML = '<div class="why">✅ 快而準！（' + time + 's）</div><div style="margin-top:4px;">' + q.why + '</div>';
     if (q.disc) $('discussNote').classList.remove('hidden');
   } else {
+    var pc = document.getElementById('play'); pc.classList.remove('shakeit'); void pc.offsetWidth; pc.classList.add('shakeit');
     $('fb').className = 'fb bad';
     $('fb').innerHTML = '<div class="why">❌ 拍錯門 — 係拍 ' + (correctZone === 'L' ? '🟢 DOER' : '🟣 DONE-TO') + ' 先啱</div><div style="margin-top:4px;">' + q.why + '</div>';
     if (q.disc) $('discussNote').classList.remove('hidden');
