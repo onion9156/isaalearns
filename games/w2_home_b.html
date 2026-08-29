@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📦 時光快遞員 — W2 Set B 屋企</title>
+<title>📦 時光快遞員 v2 — W2 Set B 屋企</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #1e1b4b 55%, #312e81); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 16px 14px 30px; }
@@ -13,26 +13,26 @@
   .head .sub { font-size: 11.5px; opacity: .75; margin-top: 3px; }
   .restart { background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.35); color: #fff; border-radius: 10px; padding: 8px 15px; font-size: 12px; font-weight: 800; cursor: pointer; }
   .progress { display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; color: #c4b5fd; margin-bottom: 10px; }
-  /* —— motion: actor stage —— */
-  .stage { display: flex; justify-content: center; align-items: center; gap: 24px; background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.2); border-radius: 16px; padding: 10px 16px 8px; margin-bottom: 10px; min-height: 64px; }
-  .actor { position: relative; font-size: 40px; animation: idle 2.4s ease-in-out infinite; transition: filter .5s, opacity .5s, transform .5s; }
-  .actor:nth-child(2) { animation-delay: .3s; }
-  .actor:nth-child(3) { animation-delay: .6s; }
+  .stage { display: flex; justify-content: center; align-items: flex-end; gap: 10px; background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.2); border-radius: 16px; padding: 12px 14px 10px; margin-bottom: 10px; min-height: 66px; }
+  .actor { position: relative; font-size: 38px; animation: idle 2.4s ease-in-out infinite; transition: filter .5s, opacity .5s, transform .5s; }
+  .actor.parcel { font-size: 30px; }
+  .actor.van { margin-right: 14px; }
+  .actor:nth-child(3) { animation-delay: .25s; }
+  .actor:nth-child(4) { animation-delay: .5s; }
   @keyframes idle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-  .actor.munching { animation: munch .65s ease; }
-  @keyframes munch { 0% { transform: scale(1); } 35% { transform: scale(1.42) rotate(-9deg); } 65% { transform: scale(1.18) rotate(5deg); } 100% { transform: scale(1); } }
-  .actor.gone { filter: grayscale(1); opacity: .4; transform: rotate(90deg) translateY(6px); animation: none; }
-  .actor .fx { position: absolute; font-size: 17px; animation: pop .5s ease; }
-  .actor .fx.love { top: -10px; right: -11px; }
-  .actor .fx.zzz { top: -12px; left: -13px; animation: floatz 1.8s ease-in-out infinite; }
-  .actor .fx.boom { top: -6px; left: -2px; font-size: 30px; }
+  @keyframes vroom { 0% { transform: translateX(0); } 30% { transform: translateX(10px) rotate(-3deg); } 60% { transform: translateX(-4px) rotate(2deg); } 100% { transform: translateX(0); } }
+  .actor.munching { animation: vroom .7s ease; }
+  .actor.gone { filter: grayscale(1); opacity: .35; transform: scale(.6); animation: none; }
+  .actor .fx { position: absolute; animation: pop .55s ease; }
+  .actor .fx.spark { top: -12px; left: 50%; margin-left: -8px; font-size: 16px; }
+  .actor .fx.boom { top: -8px; left: -4px; font-size: 26px; }
   @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.5); } 100% { transform: scale(1); } }
-  @keyframes floatz { 0%,100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(-7px); opacity: 1; } }
-  .foodfly { position: fixed; z-index: 60; font-size: 30px; pointer-events: none; transition: transform .62s cubic-bezier(.35,.05,.35,1.25); }
+  .house { position: relative; font-size: 40px; margin-left: 10px; }
+  .house .fx { position: absolute; top: -14px; left: 50%; margin-left: -9px; font-size: 18px; animation: pop .55s ease; }
+  .roadhint { text-align: center; font-size: 9.5px; color: rgba(255,255,255,.4); margin: -4px 0 8px; }
   @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
   .shakeit { animation: shake .4s; }
   @keyframes slideup { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-  /* —— quiz card —— */
   .card { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 26px 22px; box-shadow: 0 10px 26px rgba(0,0,0,.4); }
   .sentence { font-size: 18.5px; font-weight: 800; line-height: 1.6; }
   .choice-row { display: flex; flex-direction: column; gap: 11px; margin-top: 18px; }
@@ -66,13 +66,20 @@
 <div class="wrap">
   <div class="head">
     <div>
-      <h1>時光快遞員 · W2</h1>
-      <div class="sub">答啱包裹就飛去屋企 🏠 — 答錯會💥爆開！</div>
+      <h1>📦 時光快遞員 · W2</h1>
+      <div class="sub">答啱 → 快遞員🚚送包裹去屋企 🏠 · 答錯 → 包裹💥爆開！</div>
     </div>
     <button class="restart" onclick="restart()">🔄 重新開始</button>
   </div>
   <div class="progress" id="progress"></div>
-  <div class="stage" id="vanrow"><span class="actor" id="pk0">📦</span><span class="actor" id="pk1">📦</span><span class="actor" id="pk2">📦</span><span style="font-size:34px;" id="house">🏠</span></div>
+  <div class="stage" id="stage">
+    <span class="actor van" id="van">🚚</span>
+    <span class="actor parcel" id="pk0">📦</span>
+    <span class="actor parcel" id="pk1">📦</span>
+    <span class="actor parcel" id="pk2">📦</span>
+    <span class="house" id="houseEl">🏠</span>
+  </div>
+  <div class="roadhint">🚚 ─── 送貨路線 ─── 🏠 &nbsp;（答啱一件，送一件）</div>
   <div class="card" id="qcard">
     <div class="sentence" id="qtext"></div>
     <div class="choice-row" id="opts"></div>
@@ -80,20 +87,15 @@
     <button class="big nxt" id="nxt" onclick="next()" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;"></button>
   </div>
   <div class="endcard" id="endcard">
-    <div style="font-size:15px;font-weight:900;">🏁 完成了！</div>
+    <div style="font-size:15px;font-weight:900;">🏁 收更！</div>
     <div class="big-score" id="finalScore"></div>
     <div class="verdict" id="verdict"></div>
     <div class="review"><h3>📋 全部對答案 — 你揀咗乜 vs 正確答案：</h3><div id="reviewList"></div></div>
-    <button class="again" onclick="restart()">⚡ 再玩一次</button>
+    <button class="again" onclick="restart()">⚡ 再跑一轉</button>
   </div>
   <div class="foot">W2 Set B 屋企遊戲 · 10 回合 · 每局洗牌 · by 蝦蝦 🦐</div>
 </div>
 <script>
-var BANK, ACTORS = ['pk0', 'pk1', 'pk2'], STAGE_ID = "vanrow";
-var STAGE_HTML = document.getElementById(STAGE_ID).innerHTML;
-var FLY_TXT = "📦", LOVE_TXT = "✨", SAD_TXT = "💥", PROGRESS_MSG = "📦 已送";
-var GOOD = '準時送到！', BAD = '包裹撞爛咗 —', NEXT = '下一件包裹 ▶', FINISH_LBL = '交更 🏁';
-var LOSE_MSG = '📦 三件包裹都爆咗 — 睇完答案再跑一轉！', WIN_MSG = '🌟 金牌快遞員 — 全部準時到！', OK_MSG = '👍 唔錯 — 紅色嗰啲望清楚', MEH_MSG = '💪 明日再嚟 — 記住 V3 著衫 + been V-ing';
 
 var BANK = [
   { s: "Mum has been ___ dinner since 5 p.m.", o: ["cook", "cooking"], a: 1, w: "been + V-ing：been cooking。隻 verb 著 V-ing 衫。" },
@@ -107,37 +109,23 @@ var BANK = [
   { s: "Look! The delivery man has ___ our parcel!", o: ["brought", "brung"], a: 0, w: "bring→brought V3。" },
   { s: "They have ___ that old car since March — 幾時先整好啊？", o: ["repaired", "been repairing"], a: 1, w: "since March 仲整緊 → been repairing。" }
 ];
-
-
 var order = [], i = 0, score = 0, lives = 3, fed = 0, results = [];
 function $(id){ return document.getElementById(id); }
 function shuffle(a){ for (var k = a.length - 1; k > 0; k--){ var j = Math.floor(Math.random() * (k + 1)); var t = a[k]; a[k] = a[j]; a[j] = t; } return a; }
-function actorIds(){ return ACTORS; }
-function resetStage(){ $(STAGE_ID).innerHTML = STAGE_HTML; }
-function firstFree(){
-  var ids = actorIds();
-  for (var k = 0; k < ids.length; k++){ var el = $(ids[k]); if (!el.classList.contains('fed') && !el.classList.contains('gone')) return el; }
+function resetStage(){
+  $('stage').innerHTML = '<span class="actor van" id="van">🚚</span>' +
+    '<span class="actor parcel" id="pk0">📦</span>' +
+    '<span class="actor parcel" id="pk1">📦</span>' +
+    '<span class="actor parcel" id="pk2">📦</span>' +
+    '<span class="house" id="houseEl">🏠</span>';
+}
+function nextParcel(){
+  var ids = ['pk0', 'pk1', 'pk2'];
+  for (var k = 0; k < ids.length; k++){
+    var el = $(ids[k]);
+    if (!el.classList.contains('delivered') && !el.classList.contains('gone')) return el;
+  }
   return null;
-}
-function lastFree(){
-  var ids = actorIds();
-  for (var k = ids.length - 1; k >= 0; k--){ var el = $(ids[k]); if (!el.classList.contains('gone') && !el.classList.contains('fed')) return el; }
-  return null;
-}
-function flyEl(fromEl, toEl, txt, onDone){
-  var f = document.createElement('div');
-  f.className = 'foodfly'; f.textContent = txt;
-  var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
-  var sx = fr.left + fr.width / 2 - 15, sy = fr.top + fr.height / 2 - 15;
-  f.style.left = sx + 'px'; f.style.top = sy + 'px';
-  document.body.appendChild(f);
-  var dx = (tr.left + tr.width / 2 - 15) - sx, dy = (tr.top + tr.height / 2 - 15) - sy;
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){ f.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.55)'; }); });
-  setTimeout(function(){ f.remove(); if (onDone) onDone(); }, 640);
-}
-function shakeCard(){
-  var c = $('qcard');
-  c.classList.remove('shakeit'); void c.offsetWidth; c.classList.add('shakeit');
 }
 function restart(){
   order = shuffle(BANK.map(function(_, n){ return n; }));
@@ -149,7 +137,7 @@ function restart(){
 }
 function showQ(){
   var c = BANK[order[i]];
-  $('progress').textContent = (i + 1) + ' / ' + BANK.length + ' · ' + PROGRESS_MSG + ' ' + fed;
+  $('progress').textContent = (i + 1) + ' / ' + BANK.length + ' · 📦 已送 ' + fed;
   $('qtext').textContent = c.s;
   var opts = $('opts'); opts.innerHTML = '';
   c.o.forEach(function(txt, n){
@@ -170,39 +158,50 @@ function pick(n, btn){
   btns[c.a].classList.add('right');
   var fb = $('fb');
   if (good){
-    score++; fed++;
+    score++;
     fb.className = 'fb show good';
-    fb.innerHTML = '✅ ' + GOOD + ' 💡 ' + c.w;
-    var target = firstFree();
-    if (target){ flyEl(btn, target, FLY_TXT, function(){ reactHappy(target); }); }
-    else { reactHappy(null); }
+    fb.innerHTML = '✅ 準時送到！ 💡 ' + c.w;
+    courierDeliver();
   } else {
     lives--;
     btn.classList.add('wrong');
     fb.className = 'fb show bad';
-    fb.innerHTML = '❌ ' + BAD + ' 💡 ' + c.w;
-    shakeCard();
-    reactSad();
+    fb.innerHTML = '❌ 包裹撞爛咗 — 💡 ' + c.w;
+    parcelBoom();
+    var qc = $('qcard');
+    qc.classList.remove('shakeit'); void qc.offsetWidth; qc.classList.add('shakeit');
   }
-  $('progress').textContent = (i + 1) + ' / ' + BANK.length + ' · ' + PROGRESS_MSG + ' ' + fed;
+  $('progress').textContent = (i + 1) + ' / ' + BANK.length + ' · 📦 已送 ' + fed;
   $('nxt').classList.add('show');
-  $('nxt').textContent = (i < BANK.length - 1 && lives > 0) ? NEXT : FINISH_LBL;
+  $('nxt').textContent = (i < BANK.length - 1 && lives > 0) ? '下一件包裹 ▶' : '交更 🏁';
 }
-function reactHappy(h){
-  if (!h) return;
-  h.classList.add('munching');
-  var l = document.createElement('span');
-  l.className = 'fx love'; l.textContent = LOVE_TXT;
-  h.appendChild(l);
-  setTimeout(function(){ h.classList.remove('munching'); }, 720);
+function courierDeliver(){
+  var van = $('van');
+  van.classList.add('munching');
+  setTimeout(function(){ van.classList.remove('munching'); }, 750);
+  var p = nextParcel();
+  if (!p){ return; }
+  var hr = $('houseEl').getBoundingClientRect();
+  var tr = p.getBoundingClientRect();
+  var dx = hr.left - 8 - (fed % 3) * 36 - tr.left;
+  var dy = hr.top - tr.top;
+  p.style.transition = 'transform .75s cubic-bezier(.3,.05,.3,1.15)';
+  p.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.85)';
+  p.classList.add('delivered');
+  fed++;
+  setTimeout(function(){
+    var s = document.createElement('span');
+    s.className = 'fx spark'; s.textContent = '✨';
+    $('houseEl').appendChild(s);
+  }, 700);
 }
-function reactSad(){
-  var h = lastFree();
-  if (!h) return;
-  h.classList.add('gone');
-  var z = document.createElement('span');
-  z.className = 'fx zzz'; z.textContent = SAD_TXT;
-  h.appendChild(z);
+function parcelBoom(){
+  var p = nextParcel();
+  if (!p) return;
+  p.classList.add('gone');
+  var b = document.createElement('span');
+  b.className = 'fx boom'; b.textContent = '💥';
+  p.appendChild(b);
 }
 function next(){
   if (lives <= 0 || i >= BANK.length - 1){ finish(); return; }
@@ -213,7 +212,7 @@ function finish(){
   $('progress').textContent = '';
   $('finalScore').textContent = score + ' / ' + BANK.length;
   var missed = results.filter(function(r){ return !r.got; });
-  $('verdict').textContent = lives <= 0 ? LOSE_MSG : (score >= 9 ? WIN_MSG : (score >= 7 ? OK_MSG : MEH_MSG));
+  $('verdict').textContent = lives <= 0 ? '📦 三件包裹都爆咗 — 睇完答案再跑一轉！' : (score >= 9 ? '🌟 金牌快遞員 — 全部準時到！' : (score >= 7 ? '👍 唔錯 — 紅色嗰啲望清楚' : '💪 明日再嚟 — 記住 V3 著衫 + been V-ing'));
   var h = '';
   results.forEach(function(r){
     h += '<div class="rrow' + (r.got ? '' : ' bad') + '">'
