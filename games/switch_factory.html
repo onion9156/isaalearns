@@ -67,6 +67,16 @@
   .endrow .why { color: #b45309; }
   .foot { text-align: center; font-size: 10.5px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
   .hidden { display: none !important; }
+
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  .shakeit { animation: shake .4s; }
+  @keyframes slideup { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @keyframes slam { 0% { transform: scale(2.2); opacity: 0; } 60% { transform: scale(.92); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  .stampzone.show .stamp { animation: slam .3s cubic-bezier(.34,1.56,.64,1); }
+  .stampzone.show .stamp.rej { animation-delay: .08s; }
+  @keyframes floatmoney { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-34px); opacity: 0; } }
+  .float-money { position: fixed; z-index: 70; font-size: 20px; font-weight: 900; color: #fbbf24; pointer-events: none; animation: floatmoney .9s ease-out forwards; text-shadow: 0 2px 6px rgba(0,0,0,.5); }
 </style>
 </head>
 <body>
@@ -249,6 +259,12 @@ function resolve(ok, whyHtml, action) {
   var fb = $('fb');
   if (ok) {
     score += 10 * combo;
+    var fm = document.createElement('div');
+    fm.className = 'float-money'; fm.textContent = '+💰' + (10 * combo);
+    var sb = document.getElementById('scorebar').getBoundingClientRect();
+    fm.style.left = (sb.left + 10) + 'px'; fm.style.top = (sb.bottom + 4) + 'px';
+    document.body.appendChild(fm);
+    setTimeout(function(){ fm.remove(); }, 950);
     if (combo > bestCombo) bestCombo = combo;
     combo++;
     fb.className = 'fb show';
