@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📸 Perfect Snap! — W2 Set A 堂上</title>
+<title>📸 Perfect Snap! 堂上版</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #1e1b4b 55%, #312e81); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 16px 14px 30px; }
@@ -15,6 +15,9 @@
   .progress { display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; color: #c4b5fd; margin-bottom: 10px; }
   .card { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 26px 22px; box-shadow: 0 10px 26px rgba(0,0,0,.4); }
   .sentence { font-size: 18.5px; font-weight: 800; line-height: 1.6; }
+  .typein { width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 13.5px; font-weight: 700; margin-top: 14px; color: #1e293b; background: #fff; }
+  .typein:focus { outline: 2px solid #7c3aed; }
+  .typehint { font-size: 10.5px; color: #94a3b8; margin-top: 4px; }
   .ansbox { margin-top: 16px; background: #f1f5f9; border-left: 5px solid #16a34a; border-radius: 10px; padding: 13px 15px; display: none; }
   .ansbox.show { display: block; }
   .ansbox .ans { font-size: 15.5px; font-weight: 900; color: #14532d; line-height: 1.55; }
@@ -26,35 +29,23 @@
   .mk { flex: 1; border: 0; border-radius: 13px; padding: 14px 0; font-size: 15.5px; font-weight: 900; cursor: pointer; }
   .mk.yes { background: #dcfce7; color: #14532d; border: 2.5px solid #16a34a; }
   .mk.no { background: #fee2e2; color: #7f1d1d; border: 2.5px solid #dc2626; }
-  .choice-row { display: flex; flex-direction: column; gap: 11px; margin-top: 18px; }
-  .opt { border: 2.5px solid #cbd5e1; background: #f8fafc; color: #1e293b; border-radius: 13px; padding: 15px 14px; font-size: 16px; font-weight: 900; cursor: pointer; text-align: left; }
-  .opt:hover { border-color: #7c3aed; }
-  .opt.right { border-color: #16a34a; background: #dcfce7; }
-  .opt.wrong { border-color: #dc2626; background: #fee2e2; }
-  .fb { margin-top: 14px; background: #f1f5f9; border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.65; display: none; }
-  .fb.show { display: block; }
-  .fb.good { background: #dcfce7; }
-  .fb.bad { background: #fee2e2; }
-  .nxt { display: none; width: 100%; margin-top: 12px; }
-  .nxt.show { display: block; }
-  .hearts { font-size: 15px; }
-  .streak { color: #f59e0b; }
   .endcard { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 30px 24px; text-align: center; display: none; }
   .endcard.show { display: block; }
   .big-score { font-size: 44px; font-weight: 900; color: #4c1d95; margin: 10px 0 4px; }
   .verdict { font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 16px; }
-  .missed { text-align: left; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; padding: 13px 15px; margin-top: 8px; display: none; }
-  .missed.show { display: block; }
-  .missed h3 { font-size: 12.5px; color: #991b1b; margin-bottom: 8px; }
-  .missed .m { font-size: 12px; color: #44403c; line-height: 1.65; padding: 6px 0; border-top: 1px dashed #fecaca; }
-  .missed .m b { color: #14532d; }
+  .review { text-align: left; max-height: 320px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
+  .review h3 { font-size: 12.5px; color: #334155; margin-bottom: 8px; }
+  .rrow { font-size: 12px; color: #334155; line-height: 1.7; padding: 7px 9px; border-top: 1px dashed #e2e8f0; border-radius: 6px; }
+  .rrow.bad { background: #fef2f2; }
+  .rrow .yours { color: #7c3aed; font-weight: 800; }
+  .rrow .ans { color: #14532d; font-weight: 800; }
+  .rrow .why { color: #b45309; }
   .again { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border: 0; border-radius: 13px; padding: 15px 40px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 20px; }
   .foot { text-align: center; font-size: 10.5px; color: #a5b4fc; margin-top: 14px; line-height: 1.7; }
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="head">
     <div>
       <h1>📸 Perfect Snap! 堂上版</h1>
@@ -65,6 +56,8 @@
   <div class="progress" id="progress"></div>
   <div class="card" id="qcard">
     <div class="sentence" id="sentence"></div>
+    <input class="typein" id="ansIn" autocomplete="off" spellcheck="false" placeholder="打低你嘅答案（唔打都得，口頭答完㩒揭答案）" onkeydown="if(event.key==='Enter')reveal()">
+    <div class="typehint">↑ 打咗嘅話，最後成績表會列出你嘅作答同正確答案對比</div>
     <div class="ansbox" id="ansbox"><div class="ans" id="ans"></div><div class="tip" id="tip"></div></div>
     <button class="big reveal-btn" id="revealBtn" onclick="reveal()">👀 揭答案</button>
     <div class="markrow" id="markrow">
@@ -76,72 +69,76 @@
     <div style="font-size:15px;font-weight:900;">🏁 完成了！</div>
     <div class="big-score" id="finalScore"></div>
     <div class="verdict" id="verdict"></div>
-    <div class="missed" id="missed"><h3>📝 溫吓呢啲：</h3><div id="missedList"></div></div>
+    <div class="review"><h3>📋 全部對答案 — 你嘅作答 vs 正確答案：</h3><div id="reviewList"></div></div>
     <button class="again" onclick="restart()">⚡ 再玩一次</button>
   </div>
   <div class="foot">W2 Set A 堂上遊戲 · 12 句全部新句子 · by 蝦蝦 🦐</div>
-
 </div>
 <script>
 
-var Q = [
-  { s: "She has painted the fence twice this year.", a: "Simple 📷", w: "twice = 數到兩次 → 相機，講完成次數。" },
-  { s: "We have been driving for three hours.", a: "Continuous 🎬", w: "for three hours = 時長，旅程仲未提完結 → 影片。" },
-  { s: "He has broken his phone screen.", a: "Simple 📷", w: "熒幕裂咗喺度 = 睇到結果 → 相機。" },
-  { s: "I have been learning the violin since March.", a: "Continuous 🎬", w: "since March + 仲學緊 → 影片。" },
-  { s: "They have visited Paris five times.", a: "Simple 📷", w: "five times 可數 → 相機。" },
-  { s: "The baby has been crying all night.", a: "Continuous 🎬", w: "all night 成晚 → 影片。" },
-  { s: "Mum has already cooked dinner.", a: "Simple 📷", w: "already + 晚飯整好咗 = 結果 → 相機。" },
-  { s: "The boys have been swimming since lunchtime.", a: "Continuous 🎬", w: "since lunchtime → 影片。" },
-  { s: "I have cleaned my room — look at it!", a: "Simple 📷", w: "房乾淨咗睇得到 = 結果 → 相機。" },
-  { s: "Grandpa has been telling that story for years.", a: "Continuous 🎬", w: "for years 仲講緊 → 影片。" },
-  { s: "She has just finished her drawing.", a: "Simple 📷", w: "finished + just = 啱啱完成 → 相機。" },
-  { s: "My eyes hurt — I have been playing computer games all day.", a: "Continuous 🎬", w: "all day + 眼痛係進行中嘅證據 → 影片。" }
+var CARDS = [
+  { s: "She has painted the fence twice this year.", ans: "Simple 📷", tip: "twice = 數到兩次 → 相機，講完成次數。" },
+  { s: "We have been driving for three hours.", ans: "Continuous 🎬", tip: "for three hours = 時長，旅程仲未提完結 → 影片。" },
+  { s: "He has broken his phone screen.", ans: "Simple 📷", tip: "熒幕裂咗喺度 = 睇到結果 → 相機。" },
+  { s: "I have been learning the violin since March.", ans: "Continuous 🎬", tip: "since March + 仲學緊 → 影片。" },
+  { s: "They have visited Paris five times.", ans: "Simple 📷", tip: "five times 可數 → 相機。" },
+  { s: "The baby has been crying all night.", ans: "Continuous 🎬", tip: "all night 成晚 → 影片。" },
+  { s: "Mum has already cooked dinner.", ans: "Simple 📷", tip: "already + 晚飯整好咗 = 結果 → 相機。" },
+  { s: "The boys have been swimming since lunchtime.", ans: "Continuous 🎬", tip: "since lunchtime → 影片。" },
+  { s: "I have cleaned my room — look at it!", ans: "Simple 📷", tip: "房乾淨咗睇得到 = 結果 → 相機。" },
+  { s: "Grandpa has been telling that story for years.", ans: "Continuous 🎬", tip: "for years 仲講緊 → 影片。" },
+  { s: "She has just finished her drawing.", ans: "Simple 📷", tip: "finished + just = 啱啱完成 → 相機。" },
+  { s: "My eyes hurt — I have been playing computer games all day.", ans: "Continuous 🎬", tip: "all day + 眼痛係進行中嘅證據 → 影片。" }
 ];
-var i = 0, score = 0, results = [];
+
+
+var i = 0, score = 0, results = [], typedAns = '';
 function $(id){ return document.getElementById(id); }
 function restart(){
-  i = 0; score = 0; results = [];
+  i = 0; score = 0; results = []; typedAns = '';
   $('endcard').classList.remove('show');
   $('qcard').style.display = 'block';
   showQ();
 }
 function showQ(){
-  var c = Q[i];
-  $('progress').textContent = '第 ' + (i+1) + ' / ' + Q.length + ' 題 · ✅ ' + score;
+  var c = CARDS[i];
+  $('progress').textContent = '第 ' + (i + 1) + ' / ' + CARDS.length + ' 題 · ✅ ' + score;
   $('sentence').textContent = c.s;
+  $('ansIn').value = '';
   $('ansbox').classList.remove('show');
   $('revealBtn').style.display = 'block';
   $('markrow').classList.remove('show');
+  setTimeout(function(){ $('ansIn').focus(); }, 350);
 }
 function reveal(){
-  var c = Q[i];
-  $('ans').textContent = '答案：' + c.a;
-  $('tip').textContent = '💡 ' + c.w;
+  var c = CARDS[i];
+  typedAns = $('ansIn').value.trim();
+  $('ans').textContent = c.ans;
+  $('tip').textContent = '💡 ' + c.tip;
   $('ansbox').classList.add('show');
   $('revealBtn').style.display = 'none';
   $('markrow').classList.add('show');
 }
 function mark(got){
-  results.push({ q: i+1, got: got, card: Q[i] });
+  results.push({ n: i + 1, got: got, card: CARDS[i], typed: typedAns || '（口頭作答）' });
   if (got) { score++; }
-  if (i < Q.length - 1) { i++; showQ(); } else { finish(); }
+  if (i < CARDS.length - 1) { i++; showQ(); } else { finish(); }
 }
 function finish(){
   $('qcard').style.display = 'none';
   $('progress').textContent = '';
-  $('finalScore').textContent = score + ' / ' + Q.length;
-  $('verdict').textContent = score >= 10 ? '🌟 相機影片分得好清！' : score >= 7 ? '👍 唔錯 — 錯嗰幾條望清楚先' : '💪 再嚟一次 — 慢慢諗：數到結果定講幾耐？';
-  var missed = results.filter(function(r){ return !r.got; });
-  var mEl = $('missed');
-  if (missed.length){
-    var h = '';
-    missed.forEach(function(r){
-      h += '<div class="m">第 ' + r.q + ' 題 · ' + r.card.s + '<br><b>答案：' + r.card.a + '</b> — ' + r.card.w + '</div>';
-    });
-    $('missedList').innerHTML = h;
-    mEl.classList.add('show');
-  } else { mEl.classList.remove('show'); }
+  $('finalScore').textContent = score + ' / ' + CARDS.length;
+  $('verdict').textContent = score >= 10 ? '🌟 勁！' : score >= 7 ? '👍 唔錯 — 紅色嗰啲望清楚' : '💪 再嚟一次 — 揭咗答案記住個原理';
+  var h = '';
+  results.forEach(function(r){
+    h += '<div class="rrow' + (r.got ? '' : ' bad') + '">'
+      + (r.got ? '✅' : '❌') + ' <b>第 ' + r.n + ' 題</b> · ' + r.card.s
+      + '<br><span class="yours">你嘅作答：' + r.typed + '</span>'
+      + '<br><span class="ans">' + (r.got ? '答案：' : '正確答案：') + r.card.ans + '</span>'
+      + (r.got ? '' : '<br><span class="why">💡 錯處：' + r.card.tip + '</span>')
+      + '</div>';
+  });
+  $('reviewList').innerHTML = h;
   $('endcard').classList.add('show');
 }
 restart();
