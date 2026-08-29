@@ -3,207 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎴 Game 2 — Switch 抽卡王 (In-Class 導師台)</title>
+<title>⚡ Game 2 — Switch 快問快答（堂上版）</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #4a044e); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 14px; }
-  .wrap { width: 100%; max-width: 980px; }
-  .head { background: linear-gradient(135deg, #a21caf, #db2777); border-radius: 14px; padding: 12px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .head h1 { font-size: 19px; }
-  .head .sub { font-size: 10.5px; opacity: .92; margin-top: 2px; }
-  .ghost { background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.4); color: #fff; border-radius: 9px; padding: 6px 13px; font-size: 11.5px; font-weight: 800; cursor: pointer; }
-  .panels { display: grid; grid-template-columns: 1.25fr 1fr; gap: 10px; margin-bottom: 10px; }
-  @media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
-  .panel { background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.18); border-radius: 14px; padding: 13px; }
-  .panel h2 { font-size: 13px; margin-bottom: 8px; }
-  .panel.tutor h2 { color: #fbcfe8; }
-  .panel.kid h2 { color: #bbf7d0; }
-  .deckrow { display: flex; gap: 8px; align-items: center; margin-bottom: 9px; flex-wrap: wrap; }
-  .draw-btn { border: 0; background: linear-gradient(135deg, #7c3aed, #db2777); color: #fff; border-radius: 11px; padding: 11px 20px; font-size: 14.5px; font-weight: 800; cursor: pointer; }
-  .draw-btn:disabled { opacity: .45; cursor: default; }
-  .deckcount { font-size: 12px; font-weight: 800; color: #e9d5ff; }
-  .chip { display: inline-block; font-size: 12.5px; font-weight: 900; border-radius: 8px; padding: 4px 12px; }
-  .c-p { background: #ede9fe; color: #5b21b6; } .c-a { background: #dcfce7; color: #14532d; } .c-j { background: #fee2e2; color: #7f1d1d; }
-  .boss-badge { display: inline-block; background: linear-gradient(135deg,#f59e0b,#ef4444); color: #fff; font-size: 11px; font-weight: 900; border-radius: 8px; padding: 3px 9px; margin-left: 6px; }
-  .sentence { font-size: 15.5px; font-weight: 700; line-height: 1.55; margin: 8px 0; color: #f8fafc; }
-  .reveal { background: #f8fafc; color: #1e293b; border-radius: 12px; padding: 12px 14px; margin-top: 8px; display: none; }
-  .reveal.show { display: block; }
-  .reveal .ans { font-size: 14.5px; font-weight: 800; color: #14532d; }
-  .reveal .pt { font-size: 12px; color: #475569; line-height: 1.6; margin-top: 5px; }
-  .idgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; }
-  .idbtn { border: 1.5px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08); color: #f8fafc; border-radius: 8px; padding: 7px 0; font-size: 12px; font-weight: 800; cursor: pointer; }
-  .idbtn.done { background: rgba(255,255,255,.25); text-decoration: line-through; opacity: .75; }
-  .flip-wrap { perspective: 900px; display: flex; justify-content: center; padding: 16px 0 8px; }
-  .flip { width: 130px; height: 180px; position: relative; cursor: pointer; }
-  .flip-inner { position: absolute; inset: 0; transition: transform .5s; transform-style: preserve-3d; }
-  .flip.flipped .flip-inner { transform: rotateY(180deg); }
-  .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
-  .face-back { background: linear-gradient(135deg, #1e1b4b, #4c1d95); border: 3px solid #a78bfa; color: #e9d5ff; font-size: 30px; }
-  .face-back .t { font-size: 11.5px; font-weight: 800; }
-  .face-front { background: #fff; transform: rotateY(180deg); border: 3px solid; }
-  .face-front.p { border-color: #7c3aed; } .face-front.a { border-color: #16a34a; } .face-front.j { border-color: #dc2626; }
-  .face-front .chip { font-size: 16px; padding: 8px 16px; }
-  .face-front .boss { font-size: 11px; font-weight: 900; color: #b45309; }
-  .kidhint { font-size: 11px; color: #86efac; text-align: center; line-height: 1.6; }
-  .scoreline { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: #fbcfe8; margin-top: 10px; }
-  .toggle-btn { border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #f8fafc; border-radius: 10px; padding: 8px 16px; font-size: 12px; font-weight: 800; cursor: pointer; }
-  .summary { background: #f8fafc; color: #1e293b; border-radius: 12px; padding: 12px; margin-top: 10px; display: none; }
-  .summary.show { display: block; }
-  table { width: 100%; border-collapse: collapse; }
-  th { background: #4c1d95; color: #fff; padding: 4px 7px; font-size: 10.5px; text-align: left; }
-  td { border: 1px solid #cbd5e1; padding: 4px 7px; font-size: 11px; vertical-align: top; line-height: 1.5; }
-  tr:nth-child(even) td { background: #f8fafc; }
-  .foot { text-align: center; font-size: 10.5px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
-  .note { background: rgba(253,224,71,.12); border: 1.5px dashed #facc15; border-radius: 10px; padding: 8px 12px; font-size: 11.5px; color: #fde68a; line-height: 1.6; margin-top: 8px; }
+  body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #1e1b4b 55%, #4c1d95); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 16px 14px 30px; }
+  .wrap { width: 100%; max-width: 640px; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .head h1 { font-size: 20px; }
+  .head .sub { font-size: 11.5px; opacity: .75; margin-top: 3px; }
+  .restart { background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.35); color: #fff; border-radius: 10px; padding: 8px 15px; font-size: 12px; font-weight: 800; cursor: pointer; }
+  .progress { display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; color: #c4b5fd; margin-bottom: 10px; }
+  .card { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 26px 22px; box-shadow: 0 10px 26px rgba(0,0,0,.4); }
+  .task { display: inline-block; font-size: 15px; font-weight: 900; border-radius: 10px; padding: 7px 16px; margin-bottom: 16px; }
+  .task.p { background: #ede9fe; color: #5b21b6; }
+  .task.a { background: #dcfce7; color: #14532d; }
+  .task.j { background: #fee2e2; color: #7f1d1d; }
+  .sentence { font-size: 19px; font-weight: 800; line-height: 1.6; }
+  .ansbox { margin-top: 18px; background: #f1f5f9; border-left: 5px solid #16a34a; border-radius: 10px; padding: 14px 16px; display: none; }
+  .ansbox.show { display: block; }
+  .ansbox .ans { font-size: 16px; font-weight: 900; color: #14532d; line-height: 1.55; }
+  .ansbox .tip { font-size: 12.5px; color: #475569; line-height: 1.65; margin-top: 7px; }
+  .big { width: 100%; border: 0; border-radius: 13px; padding: 15px 0; font-size: 16.5px; font-weight: 900; cursor: pointer; margin-top: 18px; }
+  .reveal-btn { background: linear-gradient(135deg, #7c3aed, #db2777); color: #fff; }
+  .markrow { display: none; gap: 12px; margin-top: 16px; }
+  .markrow.show { display: flex; }
+  .mk { flex: 1; border: 0; border-radius: 13px; padding: 15px 0; font-size: 16px; font-weight: 900; cursor: pointer; }
+  .mk.yes { background: #dcfce7; color: #14532d; border: 2.5px solid #16a34a; }
+  .mk.no { background: #fee2e2; color: #7f1d1d; border: 2.5px solid #dc2626; }
+  .endcard { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 30px 24px; text-align: center; display: none; }
+  .endcard.show { display: block; }
+  .endcard .big-score { font-size: 44px; font-weight: 900; color: #4c1d95; margin: 10px 0 4px; }
+  .endcard .verdict { font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 16px; }
+  .missed { text-align: left; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; padding: 13px 15px; margin-top: 8px; display: none; }
+  .missed.show { display: block; }
+  .missed h3 { font-size: 12.5px; color: #991b1b; margin-bottom: 8px; }
+  .missed .m { font-size: 12px; color: #44403c; line-height: 1.65; padding: 6px 0; border-top: 1px dashed #fecaca; }
+  .missed .m b { color: #14532d; }
+  .again { background: linear-gradient(135deg, #7c3aed, #db2777); color: #fff; border: 0; border-radius: 13px; padding: 15px 40px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 20px; }
+  .foot { text-align: center; font-size: 10.5px; color: #a5b4fc; margin-top: 14px; line-height: 1.7; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="head">
     <div>
-      <h1>🎴 Game 2 · Switch 抽卡王 — 導師台</h1>
-      <div class="sub">左邊你睇（答案+要點）· 右邊 Isaac 睇（只有色卡）· 洗牌抽卡，色碼就係訓練</div>
+      <h1>⚡ Switch 快問快答</h1>
+      <div class="sub">睇句子 → 講出答案 → 揭答案 → 撳 ✅ / ❌</div>
     </div>
-    <button class="ghost" onclick="newDeck()">🔄 重新洗牌</button>
+    <button class="restart" onclick="restart()">🔄 重新開始</button>
   </div>
 
-  <div class="panels">
-    <div class="panel tutor">
-      <h2>🧑‍🏫 導師台 — 得你睇到答案</h2>
-      <div class="deckrow">
-        <button class="draw-btn" id="drawBtn" onclick="drawNext()">抽下一張 🎴</button>
-        <span class="deckcount" id="deckCount">未開始 · 12 張牌喺疊度</span>
-      </div>
-      <div id="tutorEmpty" style="font-size:12px;color:#e9d5ff;line-height:1.7;">
-        撳「抽下一張」開始。玩法：Isaac 抽卡 → 讀出 chip 顏色（要佢把口講：紫／綠／紅！）→ 白板寫答案 → 你先揭呢邊對答案。<br><br>
-        計分：P/A 轉換 +2（結構+時態都啱）或 +1（得結構啱）· JUDGE +2（啱＋講得出點解）· ⚔ BOSS 雙倍 · 過關線 <b>20 分</b>
-      </div>
-      <div id="tutorCard" style="display:none">
-        <div id="tutorChip"></div>
-        <div class="sentence" id="tutorSentence"></div>
-        <div class="reveal show">
-          <div class="ans" id="tutorAns"></div>
-          <div class="pt" id="tutorPoint"></div>
-        </div>
-      </div>
-      <div class="idgrid" id="idgrid"></div>
-      <div class="scoreline"><span id="drawnCount">已抽 0/12</span><span id="deckLeft"></span></div>
-      <div class="note">📊 <b>Switch-point tally（你私下記）：</b>連續兩張同色之後轉色嗰張，佢錯唔錯？錯 3 次以上 = 確認「自動導航」，之後每一份練習都要混向。</div>
-    </div>
+  <div class="progress" id="progress"></div>
 
-    <div class="panel kid">
-      <h2>👦 Isaac 側 — 撞一下張卡揭色</h2>
-      <div class="flip-wrap">
-        <div class="flip" id="flipCard" onclick="flipCard()">
-          <div class="flip-inner">
-            <div class="face face-back">🎴<span class="t">撞我揭卡！</span></div>
-            <div class="face face-front p" id="kidFace">
-              <span class="chip" id="kidChip"></span>
-              <span class="boss" id="kidBoss"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="kidhint">卡背冇字 — 揭開先見到任務顏色 🟣🟢🔴<br>揭之前把口講一次：「呢局係咩色！」</div>
+  <div class="card" id="qcard">
+    <span class="task" id="taskChip"></span>
+    <div class="sentence" id="sentence"></div>
+    <div class="ansbox" id="ansbox">
+      <div class="ans" id="ans"></div>
+      <div class="tip" id="tip"></div>
+    </div>
+    <button class="big reveal-btn" id="revealBtn" onclick="reveal()">👀 揭答案</button>
+    <div class="markrow" id="markrow">
+      <button class="mk yes" onclick="mark(true)">✅ 啱</button>
+      <button class="mk no" onclick="mark(false)">❌ 錯</button>
     </div>
   </div>
 
-  <div style="text-align:center;">
-    <button class="toggle-btn" onclick="toggleSummary()">📋 全部卡總覽（recap 用 — 揭咗先好撳）</button>
+  <div class="endcard" id="endcard">
+    <div style="font-size:15px;font-weight:900;">🏁 完成了！</div>
+    <div class="big-score" id="finalScore"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="missed" id="missed">
+      <h3>📝 溫吓呢啲 — 啱完整答案：</h3>
+      <div id="missedList"></div>
+    </div>
+    <button class="again" onclick="restart()">⚡ 再玩一次</button>
   </div>
-  <div class="summary" id="summary"></div>
 
-  <div class="foot">Onion 堂上用 · 每局重新洗牌 · 卡同功課 Part B/D 同設計但全部係新句子</div>
+  <div class="foot">Onion 堂上用 · 12 條題目（→被動 / →主動 / 啱定錯 輪住嚟）· 全部新句子，同功課 Part B/D 同設計</div>
 </div>
 
 <script>
 var CARDS = [
-  { n: 1, m: "P", boss: false, s: "Mum waters the plants every evening.", ans: "The plants are watered by mum every evening.", pt: "plants = 眾數 → be 用 are。water→watered V3。mum 落 by-phrase。" },
-  { n: 2, m: "A", boss: false, s: "The window was broken by the boys.", ans: "The boys broke the window.", pt: "刪走 was，時態搬返落 verb：break → broke（過去被動 ↔ 過去主動 = V2）。" },
-  { n: 3, m: "J", boss: false, s: "The thief was arrested by the police last night.", ans: "✔ 啱 — 正確嘅過去被動", pt: "receiver 主語（thief）+ was + V3 (arrested) + by-phrase，全部啱晒。" },
-  { n: 4, m: "P", boss: false, s: "The students cleaned the classroom after school.", ans: "The classroom was cleaned by the students after school.", pt: "classroom 做主語。過去被動 = was cleaned。clean 係規則動詞，V3 = V+ed。" },
-  { n: 5, m: "A", boss: false, s: "Rice is grown in this village.", ans: "People grow rice in this village.", pt: "冇 by-phrase → 補 doer（people / villagers）。rice 轉做 object。people 眾數 → grow 冇 s！" },
-  { n: 6, m: "J", boss: false, s: "We were enjoyed the party very much.", ans: "✘ 錯 — 多餘 be", pt: "We 係 doer → 一定要 active：We enjoyed the party very much.（enjoy 有 object，doer 主語唔可以用被動）" },
-  { n: 7, m: "P", boss: false, s: "Somebody took Charles's umbrella by mistake.", ans: "Charles's umbrella was taken by mistake.", pt: "umbrella 做主語。Somebody 喺被動句會消失。take → taken V3。" },
-  { n: 8, m: "A", boss: true, s: "The email has been sent by Mr. Chan.", ans: "Mr. Chan has sent the email.", pt: "BOSS：perfect 被動 → perfect 主動。has been sent → has sent（have/has + V3）。tense 住喺 has 度，唔可以跌。" },
-  { n: 9, m: "J", boss: false, s: "The train was arrived at platform two at 9 a.m.", ans: "✘ 錯 — 不及物動詞", pt: "arrive 冇 object → 永遠冇被動！正確：The train arrived at platform two…（-it test：arrive it? ✗）" },
-  { n: 10, m: "P", boss: true, s: "The inspector was testing the students during lunch break.", ans: "The students were being tested by the inspector during lunch break.", pt: "BOSS：過去進行被動 = was/were being + V3。8月15號佢寫過 was tested 欠 being — 今次要殺咗佢。SVA：students → were。" },
-  { n: 11, m: "A", boss: false, s: "The new swimming pool will be opened next month.", ans: "They will open the new swimming pool next month.", pt: "刪 be 之後 tense 留喺 will 度 → will + 原形 open。冇 agent → 補 they / people / the government。" },
-  { n: 12, m: "J", boss: false, s: "The medicines are tested by scientists every year.", ans: "✔ 啱 — 包括 SVA（medicines 眾數 → are）", pt: "反亂圈卡：呢句完全正確。講唔得出邊度錯 = 就係冇錯！" }
+  { m: "P", s: "Mum waters the plants every evening.", ans: "The plants are watered by mum every evening.", tip: "plants = 眾數 → be 用 are。water→watered V3。mum 落 by-phrase。" },
+  { m: "A", s: "The window was broken by the boys.", ans: "The boys broke the window.", tip: "刪走 was，時態搬返落 verb：break → broke（過去被動 ↔ 過去主動 = V2）。" },
+  { m: "J", s: "The thief was arrested by the police last night.", ans: "✔ 啱 — 正確嘅過去被動", tip: "receiver 主語（thief）+ was + V3 (arrested) + by-phrase，全部啱晒。" },
+  { m: "P", s: "The students cleaned the classroom after school.", ans: "The classroom was cleaned by the students after school.", tip: "classroom 做主語。過去被動 = was cleaned。clean 係規則動詞，V3 = V+ed。" },
+  { m: "A", s: "Rice is grown in this village.", ans: "People grow rice in this village.", tip: "冇 by-phrase → 補 doer（people / villagers）。rice 轉做 object。people 眾數 → grow 冇 s！" },
+  { m: "J", s: "We were enjoyed the party very much.", ans: "✘ 錯 — 多餘 be", tip: "We 係 doer → 一定要 active：We enjoyed the party very much.（enjoy 有 object，doer 主語唔可以用被動）" },
+  { m: "P", s: "Somebody took Charles's umbrella by mistake.", ans: "Charles's umbrella was taken by mistake.", tip: "umbrella 做主語。Somebody 喺被動句會消失。take → taken V3。" },
+  { m: "A", s: "The email has been sent by Mr. Chan.", ans: "Mr. Chan has sent the email.", tip: "perfect 被動 → perfect 主動。has been sent → has sent（have/has + V3）。tense 住喺 has 度，唔可以跌。" },
+  { m: "J", s: "The train was arrived at platform two at 9 a.m.", ans: "✘ 錯 — 不及物動詞", tip: "arrive 冇 object → 永遠冇被動！正確：The train arrived at platform two…（-it test：arrive it? ✗）" },
+  { m: "P", s: "The inspector was testing the students during lunch break.", ans: "The students were being tested by the inspector during lunch break.", tip: "過去進行被動 = was/were being + V3。8月15號佢寫過 was tested 欠 being — 今次要殺咗佢。SVA：students → were。" },
+  { m: "A", s: "The new swimming pool will be opened next month.", ans: "They will open the new swimming pool next month.", tip: "刪 be 之後 tense 留喺 will 度 → will + 原形 open。冇 agent → 補 they / people / the government。" },
+  { m: "J", s: "The medicines are tested by scientists every year.", ans: "✔ 啱 — 包括 SVA（medicines 眾數 → are）", tip: "呢句完全正確。講唔得出邊度錯 = 就係冇錯！" }
 ];
-var MSG = { P: "→ PASSIVE", A: "→ ACTIVE", J: "JUDGE ✔/✘" };
-var COLOR = { P: "c-p", A: "c-a", J: "c-j" };
-var FC = { P: "p", A: "a", J: "j" };
-var deck = [], pos = -1, drawn = {}, flipped = false;
+var TASK = { P: "→ 轉做 PASSIVE 被動", A: "→ 轉做 ACTIVE 主動", J: "啱定錯？✔ / ✘" };
+var TCLS = { P: "p", A: "a", J: "j" };
+var i = 0, score = 0, results = [];
 
-function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-function $(id) { return document.getElementById(id); }
-
-function newDeck() {
-  deck = shuffle(CARDS.slice());
-  pos = -1; drawn = {}; flipped = false;
-  $('flipCard').classList.remove('flipped');
-  $('tutorCard').style.display = 'none';
-  $('tutorEmpty').style.display = 'block';
-  var g = $('idgrid'); g.innerHTML = '';
-  CARDS.forEach(function(c) {
-    var b = document.createElement('button');
-    b.className = 'idbtn'; b.id = 'idbtn' + c.n; b.textContent = c.n;
-    b.onclick = function() { jumpTo(c.n); };
-    g.appendChild(b);
-  });
-  updateCounts();
+function restart() {
+  i = 0; score = 0; results = [];
+  document.getElementById('endcard').classList.remove('show');
+  document.getElementById('qcard').style.display = 'block';
+  showQ();
 }
-function updateCounts() {
-  var n = Object.keys(drawn).length;
-  $('drawnCount').textContent = '已抽 ' + n + '/12';
-  $('deckLeft').textContent = pos < deck.length - 1 ? ('疊內剩返 ' + (deck.length - 1 - pos) + ' 張') : '成疊抽完 — 用號碼格重溫';
+function showQ() {
+  var c = CARDS[i];
+  document.getElementById('progress').textContent = '第 ' + (i + 1) + ' / ' + CARDS.length + ' 題 · ✅ ' + score;
+  var chip = document.getElementById('taskChip');
+  chip.textContent = TASK[c.m];
+  chip.className = 'task ' + TCLS[c.m];
+  document.getElementById('sentence').textContent = c.s;
+  document.getElementById('ansbox').classList.remove('show');
+  document.getElementById('revealBtn').style.display = 'block';
+  document.getElementById('markrow').classList.remove('show');
 }
-function drawNext() {
-  if (pos >= deck.length - 1) { return; }
-  pos++;
-  showCard(deck[pos]);
+function reveal() {
+  var c = CARDS[i];
+  document.getElementById('ans').textContent = c.ans;
+  document.getElementById('tip').textContent = '💡 ' + c.tip;
+  document.getElementById('ansbox').classList.add('show');
+  document.getElementById('revealBtn').style.display = 'none';
+  document.getElementById('markrow').classList.add('show');
 }
-function jumpTo(n) {
-  var c = CARDS.filter(function(x) { return x.n === n; })[0];
-  showCard(c);
+function mark(got) {
+  results.push({ q: i + 1, got: got, card: CARDS[i] });
+  if (got) { score++; }
+  if (i < CARDS.length - 1) { i++; showQ(); } else { finish(); }
 }
-function showCard(c) {
-  drawn[c.n] = true;
-  $('tutorEmpty').style.display = 'none';
-  $('tutorCard').style.display = 'block';
-  var bossHtml = c.boss ? '<span class="boss-badge">⚔ BOSS · 雙倍分</span>' : '';
-  $('tutorChip').innerHTML = '<span class="chip ' + COLOR[c.m] + '">' + MSG[c.m] + '</span>' + bossHtml;
-  $('tutorSentence').innerHTML = c.s;
-  $('tutorAns').textContent = c.ans;
-  $('tutorPoint').textContent = '💡 ' + c.pt;
-  var btn = $('drawBtn');
-  btn.disabled = (pos >= deck.length - 1);
-  btn.textContent = (pos >= deck.length - 1) ? '成疊抽完 🏁' : '抽下一張 🎴';
-  if (!flipped) { flipped = true; $('flipCard').classList.add('flipped'); }
-  $('kidChip').className = 'chip ' + COLOR[c.m];
-  $('kidChip').textContent = MSG[c.m];
-  $('kidFace').className = 'face face-front ' + FC[c.m];
-  $('kidBoss').textContent = c.boss ? '⚔ BOSS CARD!' : '';
-  $('idbtn' + c.n).classList.add('done');
-  updateCounts();
+function finish() {
+  document.getElementById('qcard').style.display = 'none';
+  document.getElementById('progress').textContent = '';
+  document.getElementById('finalScore').textContent = score + ' / ' + CARDS.length;
+  var missed = results.filter(function(r) { return !r.got; });
+  document.getElementById('verdict').textContent = score >= 10 ? '🌟 勁！可以挑戰更難嘅句子' : score >= 7 ? '👍 唔錯 — 錯嗰幾條望清楚先' : '💪 再嚟一次 — 慢慢嚟，記住 be + V3！';
+  var missEl = document.getElementById('missed');
+  if (missed.length) {
+    var h = '';
+    missed.forEach(function(r) {
+      h += '<div class="m">第 ' + r.q + ' 題 · ' + r.card.s + '<br><b>答案：' + r.card.ans + '</b></div>';
+    });
+    document.getElementById('missedList').innerHTML = h;
+    missEl.classList.add('show');
+  } else {
+    missEl.classList.remove('show');
+  }
+  document.getElementById('endcard').classList.add('show');
 }
-function flipCard() {
-  if (pos < 0) { return; }
-  $('flipCard').classList.toggle('flipped');
-}
-function toggleSummary() {
-  var s = $('summary');
-  if (s.classList.contains('show')) { s.classList.remove('show'); return; }
-  var h = '<table><tr><th style="width:11%">Chip</th><th style="width:42%">Sentence</th><th>Answer + key point</th></tr>';
-  CARDS.forEach(function(c) {
-    h += '<tr><td><span class="chip ' + COLOR[c.m] + '">' + MSG[c.m] + '</span>' + (c.boss ? ' ⚔' : '') + '</td><td>' + c.s + '</td><td><b>' + c.ans + '</b><br>' + c.pt + '</td></tr>';
-  });
-  h += '</table>';
-  s.innerHTML = h;
-  s.classList.add('show');
-}
-newDeck();
+restart();
 </script>
 </body>
 </html>
