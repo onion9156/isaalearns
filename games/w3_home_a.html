@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍿 片場爆谷師 — W3 Set A 屋企</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #1e1b4b 55%, #312e81); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 16px 14px 30px; }
+  .wrap { width: 100%; max-width: 620px; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .head h1 { font-size: 20px; }
+  .head .sub { font-size: 11.5px; opacity: .75; margin-top: 3px; }
+  .restart { background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.35); color: #fff; border-radius: 10px; padding: 8px 15px; font-size: 12px; font-weight: 800; cursor: pointer; }
+  .progress { display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; color: #c4b5fd; margin-bottom: 10px; }
+  .stage { display: flex; justify-content: center; align-items: center; gap: 24px; background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.2); border-radius: 16px; padding: 10px 16px 8px; margin-bottom: 10px; min-height: 64px; }
+  .actor { position: relative; font-size: 40px; animation: idle 2.4s ease-in-out infinite; transition: filter .5s, opacity .5s, transform .5s; }
+  .actor:nth-child(2) { animation-delay: .3s; }
+  .actor:nth-child(3) { animation-delay: .6s; }
+  @keyframes idle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .actor.munching { animation: munch .65s ease; }
+  @keyframes munch { 0% { transform: scale(1); } 35% { transform: scale(1.42) rotate(-9deg); } 65% { transform: scale(1.18) rotate(5deg); } 100% { transform: scale(1); } }
+  .actor.gone { filter: grayscale(1); opacity: .4; transform: rotate(90deg) translateY(6px); animation: none; }
+  .actor .fx { position: absolute; font-size: 17px; animation: pop .5s ease; }
+  .actor .fx.love { top: -10px; right: -11px; }
+  .actor .fx.zzz { top: -12px; left: -13px; animation: floatz 1.8s ease-in-out infinite; }
+  @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.5); } 100% { transform: scale(1); } }
+  @keyframes floatz { 0%,100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(-7px); opacity: 1; } }
+  .foodfly { position: fixed; z-index: 60; font-size: 30px; pointer-events: none; transition: transform .62s cubic-bezier(.35,.05,.35,1.25); }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  .shakeit { animation: shake .4s; }
+  @keyframes slideup { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .card { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 26px 22px; box-shadow: 0 10px 26px rgba(0,0,0,.4); }
+  .sentence { font-size: 18.5px; font-weight: 800; line-height: 1.6; }
+  .choice-row { display: flex; flex-direction: column; gap: 11px; margin-top: 18px; }
+  .opt { border: 2.5px solid #cbd5e1; background: #f8fafc; color: #1e293b; border-radius: 13px; padding: 15px 14px; font-size: 16px; font-weight: 900; cursor: pointer; text-align: left; }
+  .opt:hover { border-color: #7c3aed; }
+  .opt.right { border-color: #16a34a; background: #dcfce7; }
+  .opt.wrong { border-color: #dc2626; background: #fee2e2; }
+  .fb { margin-top: 14px; background: #f1f5f9; border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.65; display: none; }
+  .fb.show { display: block; animation: slideup .28s ease; }
+  .fb.good { background: #dcfce7; }
+  .fb.bad { background: #fee2e2; }
+  .big { width: 100%; border: 0; border-radius: 13px; padding: 15px 0; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 16px; }
+  .nxt { display: none; }
+  .nxt.show { display: block; animation: slideup .25s ease; }
+  .endcard { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 30px 24px; text-align: center; display: none; }
+  .endcard.show { display: block; }
+  .big-score { font-size: 44px; font-weight: 900; color: #4c1d95; margin: 10px 0 4px; }
+  .verdict { font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 16px; }
+  .review { text-align: left; max-height: 320px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
+  .review h3 { font-size: 12.5px; color: #334155; margin-bottom: 8px; }
+  .rrow { font-size: 12px; color: #334155; line-height: 1.7; padding: 7px 9px; border-top: 1px dashed #e2e8f0; border-radius: 6px; }
+  .rrow.bad { background: #fef2f2; }
+  .rrow .yours { color: #7c3aed; font-weight: 800; }
+  .rrow .ans { color: #14532d; font-weight: 800; }
+  .rrow .why { color: #b45309; }
+  .again { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border: 0; border-radius: 13px; padding: 15px 40px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 20px; }
+  .foot { text-align: center; font-size: 10.5px; color: #a5b4fc; margin-top: 14px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>🍿 片場爆谷師 · W3</h1>
+      <div class="sub">答啱就有 🌽 落鍋 — 3 部爆谷機等緊開工，答錯部機會燒焦！</div>
+    </div>
+    <button class="restart" onclick="restart()">🔄 重新開始</button>
+  </div>
+  <div class="progress" id="progress"></div>
+  <div class="stage" id="pen"><span class="actor" id="ham0">🍿</span><span class="actor" id="ham1">🍿</span><span class="actor" id="ham2">🍿</span></div>
+  <div class="card" id="qcard">
+    <div class="sentence" id="qtext"></div>
+    <div class="choice-row" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <button class="big nxt" id="nxt" onclick="next()" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;"></button>
+  </div>
+  <div class="endcard" id="endcard">
+    <div style="font-size:15px;font-weight:900;">🏁 完成了！</div>
+    <div class="big-score" id="finalScore"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="review"><h3>📋 全部對答案 — 你揀咗乜 vs 正確答案：</h3><div id="reviewList"></div></div>
+    <button class="again" onclick="restart()">⚡ 再玩一次</button>
+  </div>
+  <div class="foot">W3 Set A 屋企遊戲 · 10 回合 · 每局洗牌</div>
+</div>
+<script>
+var ACTORS = ['ham0', 'ham1', 'ham2'], STAGE_ID = "pen";
+var STAGE_HTML = document.getElementById(STAGE_ID).innerHTML;
+var FLY_TXT = "🌽", LOVE_TXT = "💕", SAD_TXT = "💤", PROGRESS_MSG = "🍿 已爆";
+var GOOD = '正確！', BAD = '唔係呢個 —', NEXT = '下一題 ▶', FINISH_LBL = '睇結果 🏁';
+var LOSE_MSG = '💥 三部機都燒焦 — 睇完答案再嚟！', WIN_MSG = '🌟 三部機都爆到脹脹 — 爆谷大師！', OK_MSG = '👍 唔錯 — 紅色嗰啲望清楚', MEH_MSG = '💪 練多一局先 — 睇吓邊條錯咗';
+
+var BANK = [
+  { s: "The finale __ in Mong Kok tonight.", o: ["is being filmed", "is filming"], a: 0, w: "finale 係被拍 → 現在連續被動 is being + V3 ★" },
+  { s: "The costumes __ by a famous artist every year.", o: ["are design", "are designed"], a: 1, w: "被動要 V3：designed。" },
+  { s: "Look! The backdrop __ by two artists.", o: ["is painted", "is being painted"], a: 1, w: "Look! = 呢一刻進行緊 → is being + V3。" },
+  { s: "The award ceremony __ next Saturday.", o: ["will be held", "will hold"], a: 0, w: "ceremony 唔會自己舉行 → will be + V3（hold→held）。" },
+  { s: "The documentary __ by millions since Monday.", o: ["has watched", "has been watched"], a: 1, w: "documentary 被睇 → has been + V3。" },
+  { s: "The extras __ inside the hall when the star walked in.", o: ["were waiting", "were waited"], a: 0, w: "extras 自己等緊 → 主動過去進行 — 唔好見 be 就當被動！" },
+  { s: "The scene had __ before the rain started.", o: ["being shot", "been shot"], a: 1, w: "過去完成被動：had been + V3（shoot→shot）。" },
+  { s: "The tickets __ online tomorrow at 10 a.m.", o: ["will sold", "will be sold"], a: 1, w: "will + be + V3 — be 一格都唔可以慳。" },
+  { s: "The dubbing __ right now, so the studio is noisy.", o: ["is being done", "is done"], a: 0, w: "right now 進行緊 → is being + V3 ★" },
+  { s: "The villain __ by the audience at the end.", o: ["was booing", "was booed"], a: 1, w: "villain 被觀眾噓 → was + V3。" }
+];
+
+var order = [], i = 0, score = 0, lives = 3, fed = 0, results = [];
+function $(id){ return document.getElementById(id); }
+function shuffle(a){ for (var k = a.length - 1; k > 0; k--){ var j = Math.floor(Math.random() * (k + 1)); var t = a[k]; a[k] = a[j]; a[j] = t; } return a; }
+function resetStage(){ $(STAGE_ID).innerHTML = STAGE_HTML; }
+function firstFree(){
+  var ids = ACTORS;
+  for (var k = 0; k < ids.length; k++){ var el = $(ids[k]); if (!el.classList.contains('fed') && !el.classList.contains('gone')) return el; }
+  return null;
+}
+function lastFree(){
+  var ids = ACTORS;
+  for (var k = ids.length - 1; k >= 0; k--){ var el = $(ids[k]); if (!el.classList.contains('gone') && !el.classList.contains('fed')) return el; }
+  return null;
+}
+function flyEl(fromEl, toEl, txt, onDone){
+  var f = document.createElement('div');
+  f.className = 'foodfly'; f.textContent = txt;
+  var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
+  var sx = fr.left + fr.width / 2 - 15, sy = fr.top + fr.height / 2 - 15;
+  f.style.left = sx + 'px'; f.style.top = sy + 'px';
+  document.body.appendChild(f);
+  var dx = (tr.left + tr.width / 2 - 15) - sx, dy = (tr.top + tr.height / 2 - 15) - sy;
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ f.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.55)'; }); });
+  setTimeout(function(){ f.remove(); if (onDone) onDone(); }, 640);
+}
+function shakeCard(){
+  var c = $('qcard');
+  c.classList.remove('shakeit'); void c.offsetWidth; c.classList.add('shakeit');
+}
+function restart(){
+  order = shuffle(BANK.map(function(_, n){ return n; }));
+  i = 0; score = 0; lives = 3; fed = 0; results = [];
+  resetStage();
+  $('endcard').classList.remove('show');
+  $('qcard').style.display = 'block';
+  showQ();
+}
+function showQ(){
+  var c = BANK[order[i]];
+  $('progress').textContent = (i + 1) + ' / ' + BANK.length + ' · ' + PROGRESS_MSG + ' ' + fed;
+  $('qtext').textContent = c.s;
+  var opts = $('opts'); opts.innerHTML = '';
+  c.o.forEach(function(txt, n){
+    var b = document.createElement('button');
+    b.className = 'opt'; b.textContent = txt;
+    b.onclick = function(){ pick(n, b); };
+    opts.appendChild(b);
+  });
+  $('fb').className = 'fb'; $('fb').innerHTML = '';
+  $('nxt').classList.remove('show');
+}
+function pick(n, btn){
+  var c = BANK[order[i]];
+  var good = n === c.a;
+  results.push({ n: i + 1, got: good, card: c, pick: c.o[n] });
+  var btns = $('opts').children;
+  for (var k = 0; k < btns.length; k++){ btns[k].disabled = true; }
+  btns[c.a].classList.add('right');
+  var fb = $('fb');
+  if (good){
+    score++; fed++;
+    fb.className = 'fb show good';
+    fb.innerHTML = '✅ ' + GOOD + ' 💡 ' + c.w;
+    var target = firstFree();
+    if (target){ flyEl(btn, target, FLY_TXT, function(){ reactHappy(target); }); }
+    else { reactHappy(null); }
+  } else {
+    lives--;
+    btn.classList.add('wrong');
+    fb.className = 'fb show bad';
+    fb.innerHTML = '❌ ' + BAD + ' 💡 ' + c.w;
+    shakeCard();
+    reactSad();
+  }
+  $('progress').textContent = (i + 1) + ' / ' + BANK.length + ' · ' + PROGRESS_MSG + ' ' + fed;
+  $('nxt').classList.add('show');
+  $('nxt').textContent = (i < BANK.length - 1 && lives > 0) ? NEXT : FINISH_LBL;
+}
+function reactHappy(h){
+  if (!h) return;
+  h.classList.add('munching');
+  var l = document.createElement('span');
+  l.className = 'fx love'; l.textContent = LOVE_TXT;
+  h.appendChild(l);
+  setTimeout(function(){ h.classList.remove('munching'); }, 720);
+}
+function reactSad(){
+  var h = lastFree();
+  if (!h) return;
+  h.classList.add('gone');
+  var z = document.createElement('span');
+  z.className = 'fx zzz'; z.textContent = SAD_TXT;
+  h.appendChild(z);
+}
+function next(){
+  if (lives <= 0 || i >= BANK.length - 1){ finish(); return; }
+  i++; showQ();
+}
+function finish(){
+  $('qcard').style.display = 'none';
+  $('progress').textContent = '';
+  $('finalScore').textContent = score + ' / ' + BANK.length;
+  $('verdict').textContent = lives <= 0 ? LOSE_MSG : (score >= 9 ? WIN_MSG : (score >= 7 ? OK_MSG : MEH_MSG));
+  var h = '';
+  results.forEach(function(r){
+    h += '<div class="rrow' + (r.got ? '' : ' bad') + '">'
+      + (r.got ? '✅' : '❌') + ' <b>' + r.n + '</b> · ' + r.card.s
+      + '<br><span class="yours">你揀咗：' + r.pick + '</span>'
+      + (r.got ? '<br><span class="ans">✓ 正確</span>'
+               : '<br><span class="ans">正確答案：' + r.card.o[r.card.a] + '</span><br><span class="why">💡 ' + r.card.w + '</span>')
+      + '</div>';
+  });
+  $('reviewList').innerHTML = h;
+  $('endcard').classList.add('show');
+}
+restart();
+
+</script>
+</body>
+</html>
