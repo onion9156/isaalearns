@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 片場快答！堂上版</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, 'Helvetica Neue', sans-serif; background: linear-gradient(160deg, #0f172a, #1e1b4b 55%, #312e81); min-height: 100vh; color: #f8fafc; display: flex; justify-content: center; padding: 16px 14px 30px; }
+  .wrap { width: 100%; max-width: 620px; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .head h1 { font-size: 20px; }
+  .head .sub { font-size: 11.5px; opacity: .75; margin-top: 3px; }
+  .restart { background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.35); color: #fff; border-radius: 10px; padding: 8px 15px; font-size: 12px; font-weight: 800; cursor: pointer; }
+  .progress { display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; color: #c4b5fd; margin-bottom: 10px; }
+  .card { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 26px 22px; box-shadow: 0 10px 26px rgba(0,0,0,.4); }
+  .sentence { font-size: 18.5px; font-weight: 800; line-height: 1.6; }
+  .typein { width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 13.5px; font-weight: 700; margin-top: 14px; color: #1e293b; background: #fff; }
+  .typein:focus { outline: 2px solid #7c3aed; }
+  .typehint { font-size: 10.5px; color: #94a3b8; margin-top: 4px; }
+  .ansbox { margin-top: 16px; background: #f1f5f9; border-left: 5px solid #16a34a; border-radius: 10px; padding: 13px 15px; display: none; }
+  .ansbox.show { display: block; animation: slideup .28s ease; }
+  .ansbox .ans { font-size: 15.5px; font-weight: 900; color: #14532d; line-height: 1.55; }
+  .ansbox .tip { font-size: 12.5px; color: #475569; line-height: 1.65; margin-top: 6px; }
+  .big { width: 100%; border: 0; border-radius: 13px; padding: 15px 0; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 16px; }
+  .reveal-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; }
+  .markrow { display: none; gap: 12px; margin-top: 14px; }
+  .markrow.show { display: flex; }
+  .mk { flex: 1; border: 0; border-radius: 13px; padding: 14px 0; font-size: 15.5px; font-weight: 900; cursor: pointer; }
+  .mk.yes { background: #dcfce7; color: #14532d; border: 2.5px solid #16a34a; }
+  .mk.no { background: #fee2e2; color: #7f1d1d; border: 2.5px solid #dc2626; }
+  .endcard { background: rgba(255,255,255,.98); color: #1e293b; border-radius: 18px; padding: 30px 24px; text-align: center; display: none; }
+  .endcard.show { display: block; }
+  .big-score { font-size: 44px; font-weight: 900; color: #4c1d95; margin: 10px 0 4px; }
+  .verdict { font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 16px; }
+  .review { text-align: left; max-height: 320px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
+  .review h3 { font-size: 12.5px; color: #334155; margin-bottom: 8px; }
+  .rrow { font-size: 12px; color: #334155; line-height: 1.7; padding: 7px 9px; border-top: 1px dashed #e2e8f0; border-radius: 6px; }
+  .rrow.bad { background: #fef2f2; }
+  .rrow .yours { color: #7c3aed; font-weight: 800; }
+  .rrow .ans { color: #14532d; font-weight: 800; }
+  .rrow .why { color: #b45309; }
+  .again { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border: 0; border-radius: 13px; padding: 15px 40px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 20px; }
+  .foot { text-align: center; font-size: 10.5px; color: #a5b4fc; margin-top: 14px; line-height: 1.7; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  .shakeit { animation: shake .4s; }
+  @keyframes slideup { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>🎬 片場快答！堂上版</h1>
+      <div class="sub">睇方向 → 口頭講新句 → 揭答案對比 → 撳 ✅ / ❌</div>
+    </div>
+    <button class="restart" onclick="restart()">🔄 重新開始</button>
+  </div>
+  <div class="progress" id="progress"></div>
+  <div class="card" id="qcard">
+    <div class="sentence" id="sentence"></div>
+    <input class="typein" id="ansIn" autocomplete="off" spellcheck="false" placeholder="打你嘅新句（唔打都得，口頭答完㩒揭答案）" onkeydown="if(event.key==='Enter')reveal()">
+    <div class="typehint">↑ 打咗嘅話，最後成績表會列出你嘅作答同正確答案對比</div>
+    <div class="ansbox" id="ansbox"><div class="ans" id="ans"></div><div class="tip" id="tip"></div></div>
+    <button class="big reveal-btn" id="revealBtn" onclick="reveal()">👀 揭答案</button>
+    <div class="markrow" id="markrow">
+      <button class="mk yes" onclick="mark(true)">✅ 啱</button>
+      <button class="mk no" onclick="mark(false)">❌ 錯</button>
+    </div>
+  </div>
+  <div class="endcard" id="endcard">
+    <div style="font-size:15px;font-weight:900;">🏁 完成了！</div>
+    <div class="big-score" id="finalScore"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="review"><h3>📋 全部對答案 — 你嘅作答 vs 正確答案：</h3><div id="reviewList"></div></div>
+    <button class="again" onclick="restart()">⚡ 再玩一次</button>
+  </div>
+  <div class="foot">W3 Set A 堂上遊戲 · 12 句全部新句子</div>
+</div>
+<script>
+
+var CARDS = [
+  { s: "→被動：The director shoots the finale in Mong Kok.", ans: "The finale is shot in Mong Kok by the director.", tip: "現在簡單被動：is + V3 — shoot 嘅 V3 係 shot。" },
+  { s: "→主動：The costumes were being stitched all night.", ans: "(The tailors) were stitching the costumes all night.", tip: "★ tense-carry：were being + V3 → 主動係過去進行 were + V-ing，個 ing 唔可以跌！" },
+  { s: "→被動：They have nominated two Hong Kong films.", ans: "Two Hong Kong films have been nominated.", tip: "完成被動：have been + V3，agent 短就唔使寫 by them。" },
+  { s: "判斷（啱就照寫）：The singer is being interviewed on the red carpet right now.", ans: "T — 照寫：The singer is being interviewed on the red carpet right now.", tip: "★ 連續被動 milestone：is being + V3 — 呢句完全正確，唔好改！" },
+  { s: "→被動：The cinema will show the documentary next Friday.", ans: "The documentary will be shown next Friday.", tip: "將來被動：will be + V3 — show 嘅 V3 係 shown。" },
+  { s: "→主動：The award was presented by Mr Lam.", ans: "Mr Lam presented the award.", tip: "was presented → 過去簡單 presented，tense 跟 be 一齊搬。" },
+  { s: "→被動：Someone is painting the backdrop right now.", ans: "The backdrop is being painted right now.", tip: "★ milestone：現在連續被動 is being + V3。" },
+  { s: "判斷（啱就照寫）：The credits were rolling when the lights came on.", ans: "T — 照寫：The credits were rolling when the lights came on.", tip: "roll 呢度冇受詞 → 主動進行正確，唔好手快變被動！" },
+  { s: "→主動：The sequel has been filmed in six countries.", ans: "(They) have filmed the sequel in six countries.", tip: "has/have been + V3 → have + V3：filmed。" },
+  { s: "→被動：The studio had released the film before the strike.", ans: "The film had been released before the strike.", tip: "過去完成被動：had been + V3。" },
+  { s: "→主動：The sets will be demolished after the shoot.", ans: "(The studio) will demolish the sets after the shoot.", tip: "will be + V3 → will + V：demolish。" },
+  { s: "判斷（啱就照寫）：The letters has been delivered by the postman.", ans: "F → The letters HAVE been delivered by the postman.", tip: "SVA：letters 係眾數 → have（跟 be 一樣要跟主語）。" }
+];
+
+var i = 0, score = 0, results = [], typedAns = '';
+function $(id){ return document.getElementById(id); }
+function restart(){
+  i = 0; score = 0; results = []; typedAns = '';
+  $('endcard').classList.remove('show');
+  $('qcard').style.display = 'block';
+  showQ();
+}
+function showQ(){
+  var c = CARDS[i];
+  $('progress').textContent = '第 ' + (i + 1) + ' / ' + CARDS.length + ' 題 · ✅ ' + score;
+  $('sentence').textContent = c.s;
+  $('ansIn').value = '';
+  $('ansbox').classList.remove('show');
+  $('revealBtn').style.display = 'block';
+  $('markrow').classList.remove('show');
+  setTimeout(function(){ $('ansIn').focus(); }, 350);
+}
+function reveal(){
+  var c = CARDS[i];
+  typedAns = $('ansIn').value.trim();
+  $('ans').textContent = c.ans;
+  $('tip').textContent = '💡 ' + c.tip;
+  $('ansbox').classList.add('show');
+  $('revealBtn').style.display = 'none';
+  $('markrow').classList.add('show');
+}
+function mark(got){
+  if (!got){ var c = document.getElementById('qcard'); c.classList.remove('shakeit'); void c.offsetWidth; c.classList.add('shakeit'); }
+  results.push({ n: i + 1, got: got, card: CARDS[i], typed: typedAns || '（口頭作答）' });
+  if (got) { score++; }
+  if (i < CARDS.length - 1) { i++; showQ(); } else { finish(); }
+}
+function finish(){
+  $('qcard').style.display = 'none';
+  $('progress').textContent = '';
+  $('finalScore').textContent = score + ' / ' + CARDS.length;
+  $('verdict').textContent = score >= 10 ? '🌟 勁！' : score >= 7 ? '👍 唔錯 — 紅色嗰啲望清楚' : '💪 再嚟一次 — 揭咗答案記住個原理';
+  var h = '';
+  results.forEach(function(r){
+    h += '<div class="rrow' + (r.got ? '' : ' bad') + '">'
+      + (r.got ? '✅' : '❌') + ' <b>第 ' + r.n + ' 題</b> · ' + r.card.s
+      + '<br><span class="yours">你嘅作答：' + r.typed + '</span>'
+      + '<br><span class="ans">' + (r.got ? '答案：' : '正確答案：') + r.card.ans + '</span>'
+      + (r.got ? '' : '<br><span class="why">💡 錯處：' + r.card.tip + '</span>')
+      + '</div>';
+  });
+  $('reviewList').innerHTML = h;
+  $('endcard').classList.add('show');
+}
+restart();
+
+</script>
+</body>
+</html>
